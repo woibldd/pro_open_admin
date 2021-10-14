@@ -1,0 +1,3 @@
+module.exports = {
+    MS_OPEN_OPENPLATFORM_TOKEN: "MS:OPEN:OPENPLATFORM:TOKEN:"
+}

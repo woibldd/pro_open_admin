@@ -1,0 +1,18 @@
+{
+	"debug": false,
+    "port": 8888,
+	"redis": {
+        "host": "10.7.188.154",
+        "port": 6379,
+        "auth": ""
+    },
+    "mysql": {
+        "host": "10.7.5.106",
+        "port": 3306,
+        "user": "root",
+        "password": "6yhnmju7_base",
+        "database": "ms_open",
+        "connectionLimit" : 60,
+        "charset": "UTF8MB4_BIN"
+    }
+}

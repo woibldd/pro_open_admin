@@ -1,0 +1,73 @@
+@host = http://localhost:8887
+@content-json-type = application/json
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjMxMjMxMzEyMzEyMzIxMzEyMyIsImlhdCI6MTYzNDA5NTYwMiwiZXhwIjoxNjM0MTMxNjAyfQ.pqJhi49NAMy8S3Oso-WyN-B3e_WLHhOlWRAJLU3Jfg4
+
+### 新增Token
+POST {{host}}/token/update HTTP/1.1
+content-type: {{content-json-type}}
+token: token
+
+{
+    "language": "en",
+    "name": "coinFullName",
+    "coin": "coinName",
+    "chain": "chainTest",
+    "contract": "contractTest",
+    "icon": "http://eafaef/aefa/f/aef/",
+    "priceFrom": "huobi",
+    "about": "The concept of Bitcoin",
+    "supplyTotal": "12222222",
+    "website": "",
+    "whitepaper": "",
+    "twitter": "",
+    "github": "",
+    "telegram": "",
+    "facebook": "",
+    "tools": ""
+}
+
+### 更新Token
+POST {{host}}/token/update HTTP/1.1
+content-type: {{content-json-type}}
+token: token
+
+{
+    "id": 1,
+    "language": "en",
+    "name": "coinFullName",
+    "coin": "coinName",
+    "chain": "chainTest",
+    "contract": "contractTest",
+    "icon": "http://eafaef/aefa/f/aef/",
+    "priceFrom": "huobi",
+    "about": "The concept of Bitcoin",
+    "supplyTotal": "12222222",
+    "website": "",
+    "whitepaper": "",
+    "twitter": "",
+    "github": "",
+    "telegram": "",
+    "facebook": "",
+    "tools": ""
+}
+
+
+### 获取Token详情
+GET {{host}}/token/detail HTTP/1.1
+content-type: {{content-json-type}}
+token: token
+
+{
+    "id": 1
+}
+
+### 获取Token列表
+GET {{host}}/token/list HTTP/1.1
+content-type: {{content-json-type}}
+token: token
+
+{
+    "pageNum": 1,
+    "pageSize": 10
+}
+

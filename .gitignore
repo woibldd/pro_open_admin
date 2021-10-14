@@ -1,0 +1,5 @@
+src/conf/config.json
+.idea
+.vscode
+.DS_Store
+tmp

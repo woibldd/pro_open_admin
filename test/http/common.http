@@ -1,0 +1,8 @@
+@host = http://localhost:8887
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjMxMjMxMzEyMzEyMzIxMzEyMyIsImlhdCI6MTYzNDExMjc2MCwiZXhwIjoxNjM0MTQ4NzYwfQ.Kka-jQiUNcnXinIPvaQrg3nVvZy-3y36k4yhOoRQrHw
+@content-json-type = application/json
+
+###
+GET {{host}}/common/upload HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}

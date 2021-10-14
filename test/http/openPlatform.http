@@ -1,0 +1,17 @@
+@host = http://localhost:8887
+# @host = http://118.193.40.6:8887
+
+###
+@userId = 12312313123123213123
+GET {{host}}/openPlatform/getToken?userId={{userId}} HTTP/1.1
+
+###
+POST {{host}}/openPlatform/verifyToken HTTP/1.1
+content-type: application/json
+
+{
+    "userId": "12312313123123213123",
+    "openToken": "2956229d50c578f53198ccea94d9f04c",
+    "verifyToken": "ver12312313123123213123"
+}
+

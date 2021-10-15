@@ -12,6 +12,7 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 const router = express.Router();
+router.use(express.static(__dirname + '/static'));
 router.use(function(req, res, next) {
 	var ts = new Date().getTime();
 	console.log('\n');
@@ -37,35 +38,35 @@ router.use(function(req, res, next) {
     next();
 });
 
-app.use((req, res, next) => {
-	const url = req.url;
-	const openApiRegexStrs = ['^/status/', '^/openPlatform/'];
+// app.use((req, res, next) => {
+// 	const url = req.url;
+// 	const openApiRegexStrs = ['^/open_admin/status/', '^/open_admin/user/login'];
 
-	let needCheck = true;
-	for (const regex of openApiRegexStrs) {
-		if (new RegExp(regex).test(url)) {
-			needCheck = false;
-			break;
-		}
-	}
+// 	let needCheck = true;
+// 	for (const regex of openApiRegexStrs) {
+// 		if (new RegExp(regex).test(url)) {
+// 			needCheck = false;
+// 			break;
+// 		}
+// 	}
 
-	if (needCheck) {
-		jwt.verify(req.headers.token, 'akrael', (err, decode) => {
-			if (err) {
-				console.log(err);
-				res.send({
-					status: 40001,
-					data: err.message
-				});
-			} else {
-				req.body['sessionId'] = decode.userId || '';
-				next();
-			}
-		});
-	} else {
-		next();
-	}
-});
+// 	if (needCheck) {
+// 		jwt.verify(req.headers.token, 'akrael', (err, decode) => {
+// 			if (err) {
+// 				console.log(err);
+// 				res.send({
+// 					status: 40001,
+// 					data: err.message
+// 				});
+// 			} else {
+// 				req.body['sessionId'] = decode.userId || '';
+// 				next();
+// 			}
+// 		});
+// 	} else {
+// 		next();
+// 	}
+// });
 
 function registerController(lib){
 	const Controller = require(lib);
@@ -92,7 +93,7 @@ function registerController(lib){
 			}
 		})();
 	};
-	let path = '/' + instance._pathPrefix + '/:method';
+	let path = '/open_admin/' + instance._pathPrefix + '/:method';
 	router.get(path, fun);
 	router.post(path, fun);
 }

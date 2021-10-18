@@ -54,7 +54,10 @@ module.exports = class UserController extends CoreController {
 
         return {
             total: totalCount[0].count,
-            list: result
+            list: result.map(_ => {
+                delete _.password;
+                return _;
+            })
         }
     }
    

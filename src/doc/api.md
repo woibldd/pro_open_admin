@@ -72,6 +72,38 @@ response:
 }
 ```
 
+### 4. 获取用户列表
+POST {{host}}/user/list HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+request:
+```json
+{
+    "pageNum": Number,
+    "pageSize": Number
+}
+```
+
+response:
+```json
+{
+  "status": 0,
+  "data": {
+    "total": Number,
+    "list": [
+      {
+        "id": Number,
+        "loginName": String,
+        "roleId": String,
+        "create_time": String,
+        "update_time": String
+      }
+    ]
+  }
+}
+```
+
 # 二、Token
 
 ### ENUM Token审核状态

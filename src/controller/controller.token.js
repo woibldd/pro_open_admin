@@ -61,7 +61,7 @@ module.exports = class TokenController extends CoreController {
             values: [ status, remark || '', id ]
         });
             
-        this.operationService.insertOperation(sesionId, `用户${sessionId}审核Token[${id}]状态为${this.tokenStatus.getKey(status)}`);
+        this.operationService.insertOperation(sesionId, `审核Token[${id}]状态为${this.tokenStatus.getKey(status)}`);
 
         // 同步上线
         const data = Object.assign(token, {

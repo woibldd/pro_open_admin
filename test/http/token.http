@@ -20,6 +20,6 @@ token: {{token}}
 
 {
     "id": 1,
-    "status": 1,
+    "status": 2,
     "remark": "token名称错误"
 }

@@ -61,7 +61,9 @@ module.exports = class TokenController extends CoreController {
             values: [ status, remark || '', id ]
         });
             
-        this.operationService.insertOperation(sesionId, `审核Token[${id}]状态为${this.tokenStatus.getKey(status)}`);
+        this.operationService.insertOperation(sessionId, `审核Token[${id}]状态为${this.tokenStatus.getKey(status)}`);
+
+        if (status !== this.tokenStatus.LISTED) return true;
 
         // 同步上线
         const data = Object.assign(token, {
@@ -73,7 +75,7 @@ module.exports = class TokenController extends CoreController {
             browserQuote: token.browserQuote || '',
             version: token.version || 0,
             sort: token.sort || 0,
-            status: 1,                                       // 上线
+            status: 1,                                       // ms_coin状态，上线
         });
 
         return await NetHelper.post({

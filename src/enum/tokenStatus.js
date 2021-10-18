@@ -1,9 +1,3 @@
-// module.exports = { 
-//     Reviewing: 0,   // 审核中
-//     Listed: 1,      // 审核通过
-//     FAILED: 2         // 审核未通过
-// }
-
 module.exports = class TokenStatus {
 
     constructor () {

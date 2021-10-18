@@ -2,12 +2,14 @@ const CoreController = require('./controller.core');
 const DBhelper = require('../tool/dbhelper');
 const NetHelper = require('../tool/nethelper');
 const TokenStatus = require('../enum/tokenStatus');
+const OperationService = require('../service/service.operation');
 
 module.exports = class TokenController extends CoreController {
 
 	constructor() {
         super('token');
         this.tokenStatus = new TokenStatus();
+        this.operationService = new OperationService();
     }
 
     async list (params) {
@@ -20,8 +22,8 @@ module.exports = class TokenController extends CoreController {
             where += ` AND status=${status} `;
         }
 
-        const totalCount = await DBhelper.queryMysql(MYSQL, `SELECT count(*) as count FROM Token ${where}`);
-        const result = await DBhelper.queryMysql(MYSQL, {
+        const totalCount = await DBhelper.queryMysql(MYSQL_OPEN, `SELECT count(*) as count FROM Token ${where}`);
+        const result = await DBhelper.queryMysql(MYSQL_OPEN, {
             sql: `SELECT * FROM Token ${where} ORDER BY create_time DESC LIMIT ?,?`,
             values: [parseInt(offset), parseInt(pageNum)]
         });
@@ -36,17 +38,17 @@ module.exports = class TokenController extends CoreController {
         this._checkParams(params, ['id']);
         const { id } = params;
 
-        return await DBhelper.queryMysql(MYSQL, {
+        return await DBhelper.queryMysql(MYSQL_OPEN, {
             sql: `SELECT * FROM Token WHERE id = ?`,
             values: [parseInt(id)]
         });
     }
 
     async verify (params) {
-        this._checkParams(params, ['id', 'status']);
-        const { id, status, remark } = params;
+        this._checkParams(params, ['sessionId', 'id', 'status']);
+        const { id, status, remark, sessionId } = params;
 
-        const result = await DBhelper.queryMysql(MYSQL, {
+        const result = await DBhelper.queryMysql(MYSQL_OPEN, {
             sql: `SELECT * FROM Token WHERE id = ?`,
             values: [parseInt(id)]
         });
@@ -54,10 +56,12 @@ module.exports = class TokenController extends CoreController {
         const token = result[0];
         if (token.status == this.tokenStatus.LISTED) throw new Error('Token is already listed');
         
-        await DBhelper.queryMysql(MYSQL, {
-            sql: `UPDATE Token set status=?, remark=?`,
-            values: [ status, remark || '' ]
+        await DBhelper.queryMysql(MYSQL_OPEN, {
+            sql: `UPDATE Token set status=?, remark=? WHERE id=? `,
+            values: [ status, remark || '', id ]
         });
+            
+        this.operationService.insertOperation(sesionId, `用户${sessionId}审核Token[${id}]状态为${this.tokenStatus.getKey(status)}`);
 
         // 同步上线
         const data = Object.assign(token, {

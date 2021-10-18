@@ -6,12 +6,21 @@
         "port": 6379,
         "auth": ""
     },
-    "mysql": {
+    "mysql_open": {
         "host": "localhost",
         "port": 3306,
         "user": "root",
         "password": "6yhnmju7@cc",
         "database": "ms_open",
+        "connectionLimit" : 60,
+        "charset": "UTF8MB4_BIN"
+    },
+    "mysql": {
+        "host": "localhost",
+        "port": 3306,
+        "user": "root",
+        "password": "6yhnmju7@cc",
+        "database": "ms_open_admin",
         "connectionLimit" : 60,
         "charset": "UTF8MB4_BIN"
     },

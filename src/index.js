@@ -38,35 +38,35 @@ router.use(function(req, res, next) {
     next();
 });
 
-// app.use((req, res, next) => {
-// 	const url = req.url;
-// 	const openApiRegexStrs = ['^/open_admin/status/', '^/open_admin/user/login'];
+app.use((req, res, next) => {
+	const url = req.url;
+	const openApiRegexStrs = ['^/open_admin/status/', '^/open_admin/user/login'];
+	
+	let needCheck = true;
+	for (const regex of openApiRegexStrs) {
+		if (new RegExp(regex).test(url)) {
+			needCheck = false;
+			break;
+		}
+	}
 
-// 	let needCheck = true;
-// 	for (const regex of openApiRegexStrs) {
-// 		if (new RegExp(regex).test(url)) {
-// 			needCheck = false;
-// 			break;
-// 		}
-// 	}
-
-// 	if (needCheck) {
-// 		jwt.verify(req.headers.token, 'akrael', (err, decode) => {
-// 			if (err) {
-// 				console.log(err);
-// 				res.send({
-// 					status: 40001,
-// 					data: err.message
-// 				});
-// 			} else {
-// 				req.body['sessionId'] = decode.userId || '';
-// 				next();
-// 			}
-// 		});
-// 	} else {
-// 		next();
-// 	}
-// });
+	if (needCheck) {
+		jwt.verify(req.headers.token, 'aejael', (err, decode) => {
+			if (err) {
+				console.log(err);
+				res.send({
+					status: 40001,
+					data: err.message
+				});
+			} else {
+				req.body['sessionId'] = decode.userId || '';
+				next();
+			}
+		});
+	} else {
+		next();
+	}
+});
 
 function registerController(lib){
 	const Controller = require(lib);
@@ -101,6 +101,7 @@ function registerController(lib){
 registerController('./controller/controller.status');
 registerController('./controller/controller.user');
 registerController('./controller/controller.token');
+registerController('./controller/controller.operation');
 
 router.use(function(req, res){
   res.status(404).send('404');

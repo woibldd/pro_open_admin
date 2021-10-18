@@ -20,8 +20,12 @@ global.CONFIG = require('./config.json');
 
 (async function(){
 	if(!CONFIG.mysql) return;
+	
 	const mysql = require('promise-mysql');
 	global.MYSQL = await mysql.createPool(CONFIG.mysql);
+	
+	if(!CONFIG.mysql_open) return;
+	global.MYSQL_OPEN = await mysql.createPool(CONFIG.mysql_open);
 })();
 
 (function(){

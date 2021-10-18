@@ -25,7 +25,7 @@ module.exports = class TokenController extends CoreController {
         const totalCount = await DBhelper.queryMysql(MYSQL_OPEN, `SELECT count(*) as count FROM Token ${where}`);
         const result = await DBhelper.queryMysql(MYSQL_OPEN, {
             sql: `SELECT * FROM Token ${where} ORDER BY create_time DESC LIMIT ?,?`,
-            values: [parseInt(offset), parseInt(pageNum)]
+            values: [parseInt(offset), parseInt(pageSize)]
         });
 
         return {

@@ -1,5 +1,5 @@
-@host = http://localhost:8888/open_admin
-# @host=http://106.75.67.107/open_admin
+# @host = http://localhost:8888/open_admin
+@host=http://106.75.67.107:8888/open_admin
 @content-json-type = application/json
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNDU0MjA2MywiZXhwIjoxNjM0NTc4MDYzfQ.T_oFBgeAPjcNdy6LcSzTpK2bCrf-wNWt1sbstEfk2-w
 

@@ -36,9 +36,9 @@ token: {{token}}
 request:
 ```json
 {
-    "id": "1",
-    "loginName": "chenxiaokang1",
-    "password": "chen"
+    "id": Number,
+    "loginName": String,
+    "password": String
 }
 ```
 
@@ -58,8 +58,8 @@ token: {{token}}
 request:
 ```json
 {
-    "loginName": "chenxiaokang1",
-    "password": "chen"
+    "loginName": String,
+    "password": String
 }
 ```
 
@@ -149,6 +149,19 @@ response:
 }
 ```
 
+### 2. 审核Token
+GET {{host}}/token/verify HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+```json
+{
+    "id": 1,
+    "status": 2,                   // 审核拒绝
+    "remark": "token名称错误"       // 拒绝原因
+}
+```
+
 # 三、 操作记录
 
 ### 1. 获取操作记录列表
@@ -159,8 +172,8 @@ token: {{token}}
 request:
 ```json
 {
-    "pageNum": 1,
-    "pageSize": 10
+    "pageNum": Number,
+    "pageSize": Number
 }
 ```
 

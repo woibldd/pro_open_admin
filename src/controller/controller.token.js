@@ -75,8 +75,8 @@ module.exports = class TokenController extends CoreController {
         });
         
         let failRemark = '';
-        if (token.status === this.tokenStatus.FAILED) {
-            failRemark = `拒绝原因为:${remark}`;
+        if (status === this.tokenStatus.FAILED) {
+            failRemark = `, 拒绝原因为:${remark}`;
         }
         this.operationService.insertOperation(sessionId, `审核Token[${id}]状态为${this.tokenStatus.getKey(status)}${failRemark}`);
 
@@ -97,8 +97,8 @@ module.exports = class TokenController extends CoreController {
         
         let coin = null;
         // token是否已经上线
-        if (coins && coins.length > 0) {
-            coin = coins[0];
+        if (coins && coins.list && coins.list.length > 0) {
+            coin = coins.list[0];
             if (coin.owner_eth_address !== token.owner_eth_address) throw new Error('线上已存在该Token, 请重新确认');
         }
 
@@ -114,13 +114,14 @@ module.exports = class TokenController extends CoreController {
             sort: token.sort || 0,
             status: 1,                                       // ms_coin状态，上线
         });
-        
+        delete data.id;
+
         // 线上存在该coin且归属于当前开放平台用户，则更新；否则，新增
         if (coin) data.id = coin.id;
         const updatedCoins = await NetHelper.post({
             url: `${CONFIG.host_coin}/admin/openSyncCoin`,
             json: true,
-            body: Object.assign(token, data)
+            body: data
         });
 
         // 新增后更新coin_id

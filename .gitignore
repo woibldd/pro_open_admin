@@ -8,6 +8,8 @@ node_modules
 .DS_Store
 node_modules
 /dist
+/vue
+/vue-element-admin
 
 
 # local env files

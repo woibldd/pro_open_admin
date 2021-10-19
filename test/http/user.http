@@ -1,0 +1,44 @@
+# @host = http://localhost:8888/open_admin
+@host=http://106.75.67.107:8888/open_admin
+@content-json-type = application/json
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNDU0NjMxOCwiZXhwIjoxNjM0NTgyMzE4fQ.3h2zLO9ijQyZDO0ve0Lu8o4Uth18s6mukeDC-ejDi2w
+
+### user login
+POST {{host}}/user/login HTTP/1.1
+content-type: {{content-json-type}}
+
+{
+    "loginName": "chenxiaokang",
+    "password": "chenxiaokang"
+}
+
+### update user
+POST {{host}}/user/update HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "id": "1",
+    "loginName": "chenxiaokang",
+    "password": "chenxiaokang"
+}
+
+### add user
+POST {{host}}/user/update HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "loginName": "chenxiaokang2",
+    "password": "chenxiaokang"
+}
+
+### list user
+POST {{host}}/user/list HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "pageNum": 1,
+    "pageSize": 10
+}

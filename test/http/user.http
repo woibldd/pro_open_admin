@@ -1,7 +1,7 @@
 # @host = http://localhost:8888/open_admin
 @host=http://106.75.67.107:8888/open_admin
 @content-json-type = application/json
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNDU0NjMxOCwiZXhwIjoxNjM0NTgyMzE4fQ.3h2zLO9ijQyZDO0ve0Lu8o4Uth18s6mukeDC-ejDi2w
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNDYyODg3MywiZXhwIjoxNjM0NjY0ODczfQ.7xI2uQNQNrOhYhAqkV4cp6mACyzTmufU31f840frEbE
 
 ### user login
 POST {{host}}/user/login HTTP/1.1

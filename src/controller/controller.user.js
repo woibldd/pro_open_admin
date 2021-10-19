@@ -36,7 +36,8 @@ module.exports = class UserController extends CoreController {
             expiresIn: '10h'
         });
         return {
-           jwtToken 
+           jwtToken,
+           expires: 60000*60*9.8 + Date.now()
         }
     }
 

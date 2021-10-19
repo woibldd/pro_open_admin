@@ -83,7 +83,7 @@ module.exports = class TokenController extends CoreController {
         if (status !== this.tokenStatus.LISTED) return true;
 
         // 判断线上是否存在
-        const condition = {
+        const body = {
             start: 0,
             limit: 1,
             chain: token.chain,
@@ -92,7 +92,7 @@ module.exports = class TokenController extends CoreController {
         const coins = await NetHelper.post({
             url: `${CONFIG.host_coin}/admin/coinList`,
             json: true,
-            body: condition
+            body
         });
         
         let coin = null;

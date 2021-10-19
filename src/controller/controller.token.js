@@ -69,19 +69,21 @@ module.exports = class TokenController extends CoreController {
         const token = result[0];
         if (token.status === this.tokenStatus.LISTED) throw new Error('Token is already listed');
         
-        await DBhelper.queryMysql(MYSQL_OPEN, {
-            sql: `UPDATE Token SET status=?, remark=? WHERE id=? `,
-            values: [ status, remark || '', id ]
-        });
-        
         let failRemark = '';
         if (status === this.tokenStatus.FAILED) {
             failRemark = `, 拒绝原因为:${remark}`;
         }
         this.operationService.insertOperation(sessionId, `审核Token[${id}]状态为${this.tokenStatus.getKey(status)}${failRemark}`);
 
-        if (status !== this.tokenStatus.LISTED) return true;
-
+        if (status !== this.tokenStatus.LISTED) {
+            await DBhelper.queryMysql(MYSQL_OPEN, {
+                sql: `UPDATE Token SET status=?, remark=? WHERE id=? `,
+                values: [ status, remark || '', id ]
+            });
+            return true;
+        }
+        
+        // 审核通过
         // 判断线上是否存在
         const body = {
             start: 0,
@@ -124,14 +126,20 @@ module.exports = class TokenController extends CoreController {
             body: data
         });
 
-        // 新增后更新coin_id
+        // coin新增后更新coin_id
         if (updatedCoins && updatedCoins.length > 0 && !token.coin_id) {
             const updatedCoin = updatedCoins[0];
 
             await DBhelper.queryMysql(MYSQL_OPEN, {
-                sql: `UPDATE Token SET coin_id=? WHERE id=?`,
-                values: [ updatedCoin.id, id ]
+                sql: `UPDATE Token SET coin_id=?, status, remark WHERE id=?`,
+                values: [ updatedCoin.id, status, reamrk || '', id ]
             })
+        } else {
+            // coin更新后
+            await DBhelper.queryMysql(MYSQL_OPEN, {
+                sql: `UPDATE Token SET status=?, remark=? WHERE id=? `,
+                values: [ status, remark || '', id ]
+            });
         }
         
         return true;

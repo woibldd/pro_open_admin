@@ -95,6 +95,8 @@ module.exports = class TokenController extends CoreController {
             url: `${CONFIG.host_coin}/admin/coinList`,
             json: true,
             body
+        }).catch((err) => {
+            return err;
         });
         
         let coin = null;
@@ -109,9 +111,9 @@ module.exports = class TokenController extends CoreController {
             decimals: token.decimals || 18,
             priceFrom: token.price_from || 'auto',
             price: token.price || 0,
-            browserAccount: token.browserAccount || '',
-            browserTx: token.browserTx || '',
-            browserQuote: token.browserQuote || '',
+            browserAccount: token.browser_account || '',
+            browserTx: token.browser_tx || '',
+            browserQuote: token.browser_quote || '',
             version: token.version || 0,
             sort: token.sort || 0,
             status: 1,                                       // ms_coin状态，上线
@@ -124,6 +126,8 @@ module.exports = class TokenController extends CoreController {
             url: `${CONFIG.host_coin}/admin/openSyncCoin`,
             json: true,
             body: data
+        }).catch((err) => {
+            return err;
         });
 
         // coin新增后更新coin_id

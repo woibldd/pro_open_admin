@@ -24,8 +24,8 @@ export default {
   },
   data() {
     return {
-      title: 'Vue Admin Template',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      title: 'Open Admin',
+      logo: 'https://cdn.bitkeep.vip/u_b_ce074fe0-3f1c-11e8-85bc-4f8e543529e6.png'
     }
   }
 }

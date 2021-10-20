@@ -30,6 +30,26 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+
+//审核 
+// token
+export const TokenApproval = [
+  {
+    path: 'token/list',
+    name: 'Token',
+    component: () => import('@/views/approval/token/list'),
+    meta: { title: 'token审核列表', icon: 'table' }
+  },
+  {
+    path: 'token/detail/:id',
+    name: 'tokenDetail',
+    hidden: true,
+    component: () => import('@/views/approval/token/detail'),
+    meta: { title: 'token详情', icon: 'table' }
+  }
+]
+
+
 export const constantRoutes = [
   {
     path: '/login',
@@ -46,49 +66,48 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
-    }]
-  },
-
-  {
-    path: '/token',
-    component: Layout,
-    redirect: '/token/list',
-    name: 'Token',
-    meta: { title: 'token管理', icon: 'el-icon-s-help' },
+    redirect: 'Dashboard',
     children: [
       {
-        path: 'list',
-        name: 'TokenList',
-        component: () => import('@/views/token/list'),
-        meta: { title: 'token列表', icon: 'table' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index'),
+        meta: { title: 'Dashboard', icon: 'dashboard' }
       }
     ]
   },
 
   {
-    path: '/form',
+    path: '/approval',
+    component: Layout,
+    redirect: '/approval/token/list',
+    name: 'Approval',
+    meta: { title: '审核列表', icon: 'el-icon-s-help' },
+    children: [
+      ...TokenApproval
+    ]
+  },
+  
+
+  {
+    path: '/log',
     component: Layout,
     children: [
       {
         path: 'index',
-        name: 'Form',
+        name: 'Log',
         component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
+        meta: { title: '日志管理', icon: 'form' }
       }
     ]
   },
+
+  // {
+  //   path: 'tree',
+  //   name: 'Tree',
+  //   component: () => import('@/views/tree/index'),
+  //   meta: { title: 'Tree', icon: 'tree' }
+  // }
 
   // {
   //   path: '/nested',
@@ -164,11 +183,14 @@ export const constantRoutes = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
-const createRouter = () => new Router({
-  // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
-})
+export const asyncRoutes = []
+
+const createRouter = () =>
+  new Router({
+    // mode: 'history', // require service support
+    scrollBehavior: () => ({ y: 0 }),
+    routes: constantRoutes
+  })
 
 const router = createRouter()
 

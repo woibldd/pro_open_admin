@@ -37,10 +37,11 @@ const actions = {
           const { data } = response;
           commit("SET_TOKEN", data.jwtToken);
           commit("SET_USER_INFO", { username });
-          setToken(data.jwtToken);
+          setToken(data.jwtToken,data.expires);
           resolve();
         })
         .catch(error => {
+          console.error(error)
           reject(error);
         });
     });

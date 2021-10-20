@@ -22,12 +22,12 @@ module.exports = class UserController extends CoreController {
             values: [ loginName ]
         });
         if (!users || users.length === 0) {
-            throw new Error('用户名或密码错误');
+            throw new Error('用户不存在');
         }
         
         const user = users[0];
         if (!user || !user.password || user.password !== MD5(password)) {
-            throw new Error('用户名或密码错误');
+            throw new Error('密码错误');
         }
         
         const jwtToken = jwt.sign({

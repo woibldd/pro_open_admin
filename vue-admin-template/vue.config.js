@@ -36,13 +36,11 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require("./mock/mock-server.js"),
+    // before: require("./mock/mock-server.js"),
     proxy: {
-      "/": {
-        target: "http://localhost:8888",
-        // target: 'http://localhost:8887', // 测试服
-        // target: "https://testerp.yktour.com.cn/", // 测试服
-        changeOrigin: true
+      "/open_admin": {
+        // target: "http://127.0.0.1:8888",
+        target: "http://dev.bitkeep.top:8888",
       }
     }
   },

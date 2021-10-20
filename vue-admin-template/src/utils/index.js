@@ -24,7 +24,8 @@ export function parseTime(time, cFormat) {
       } else {
         // support safari
         // https://stackoverflow.com/questions/4310953/invalid-date-in-safari
-        time = time.replace(new RegExp(/-/gm), '/')
+        // time = time.replace(new RegExp(/-/gm), '/')
+        time = new Date(time).getTime()
       }
     }
 
@@ -51,6 +52,27 @@ export function parseTime(time, cFormat) {
   return time_str
 }
 
+export const parseUA = userAgent => {
+  const ua = userAgent || navigator.userAgent || window.navigator.userAgent
+  const isIosEnv = !!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
+  const isPhonx = _ => !!(isIosEnv && screen.height == 812 && screen.width == 375)
+
+  const ret = {
+    ios: isIosEnv,
+    android: ua.indexOf('Android') > -1 || ua.indexOf('Adr') > -1,
+    Mobile: /(Mobile)/i.test(ua),
+    // MobileAll: ua.indexOf('Android') > -1 || ua.indexOf('iPhone') > -1 || ua.indexOf('SymbianOS') > -1 || ua.indexOf('Windows Phone') > -1 || ua.indexOf('iPad') > -1 || ua.indexOf('iPod') > -1,
+    wPhone: /(Windows Phone|windows[\s+]phone)/i.test(ua),
+    PC: ua.indexOf('Win') > -1 || ua.indexOf('Mac') > -1 || ua.indexOf('Linux') > -1,
+    weixin: ua.indexOf('MicroMessenger') > -1,
+    isBitKeep: /(BitKeep)/i.test(ua), //app
+    isDinhgDing: /(DingTalk)/i.test(ua),
+    isBitKeepChrome: window.isBitKeepChrome // bitkeep chrome 插件
+  }
+  ret.bitKeepAndroid = ret.isBitKeep && ret.android
+  ret.bitKeepIos = ret.isBitKeep && ret.ios
+  return process.client ? Object.assign(ret, { isPhonx: isPhonx() }) : ret
+}
 /**
  * @param {number} time
  * @param {string} option

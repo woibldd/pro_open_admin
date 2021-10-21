@@ -2,12 +2,7 @@
 	"debug": true,
     "port": 8888,
 	"redis": {
-<<<<<<< Updated upstream
-        
-        "host": "localhost",
-=======
         "host": "10.7.161.254",
->>>>>>> Stashed changes
         "port": 6379,
         "auth": ""
     },

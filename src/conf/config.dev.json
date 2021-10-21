@@ -2,13 +2,12 @@
 	"debug": true,
     "port": 8888,
 	"redis": {
-        
-        "host": "localhost",
+        "host": "10.7.161.254",
         "port": 6379,
         "auth": ""
     },
     "mysql_open": {
-        "host": "192.168.50.222",
+        "host": "10.7.159.249",
         "port": 3306,
         "user": "root",
         "password": "6yhnmju7@cc",
@@ -17,7 +16,7 @@
         "charset": "UTF8MB4_BIN"
     },
     "mysql": {
-        "host": "192.168.50.222",
+        "host": "10.7.159.249",
         "port": 3306,
         "user": "root",
         "password": "6yhnmju7@cc",

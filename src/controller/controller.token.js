@@ -135,8 +135,8 @@ module.exports = class TokenController extends CoreController {
             const updatedCoin = updatedCoins[0];
 
             await DBhelper.queryMysql(MYSQL_OPEN, {
-                sql: `UPDATE Token SET coin_id=?, status, remark WHERE id=?`,
-                values: [ updatedCoin.id, status, reamrk || '', id ]
+                sql: `UPDATE Token SET coin_id=?, status=?, remark=? WHERE id=?`,
+                values: [ updatedCoin.id, status, remark || '', id ]
             })
         } else {
             // coin更新后

@@ -63,3 +63,34 @@ router.afterEach(() => {
   // finish progress bar
   NProgress.done()
 })
+
+
+
+export function generatePermission(arr,parent={permission:""}) {
+  return arr
+    .filter(route => !route.hiddenPermission)
+    .map(route => {
+      let children = []
+      const permission=  parent.permission && parent.permission!='/' ? `${parent.permission}/${route.path}`: route.path
+      if (route.children && route.children.length > 0) {
+        children = generatePermission(route.children, { permission })        
+      }
+      
+      if(route.function && route.function.length>0){
+          children.push(...route.function.map(v=>{
+                  return {
+                      ...v,
+                      isFunction:true,
+                      title: v.title,
+                      permission: `${permission}:${v.path}`
+                  }
+          }))
+      }
+      return {
+        ...route,
+        title: route.meta ? route.meta.title : route.path,
+        children: children,
+        permission: permission,
+      }
+    })
+}

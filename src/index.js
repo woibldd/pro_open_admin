@@ -12,7 +12,7 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 const router = express.Router();
-router.use('/admin', express.static(__dirname + '/dist'));
+router.use('/admin',express.static(__dirname + '/dist'));
 router.use(function(req, res, next) {
 	var ts = new Date().getTime();
 	console.log('\n');

@@ -31,7 +31,7 @@ import Layout from '@/layout'
  * all roles can be accessed
  */
 
-//审核 
+//审核
 // token
 export const TokenApproval = [
   {
@@ -49,30 +49,36 @@ export const TokenApproval = [
   }
 ]
 
-
 export const constantRoutes = [
   {
     path: '/login',
     component: () => import('@/views/login/index'),
-    hidden: true
+    hidden: true,
+    hiddenPermission: true
   },
 
   {
     path: '/404',
     component: () => import('@/views/404'),
-    hidden: true
+    hidden: true,
+    hiddenPermission: true
   },
 
   {
     path: '/',
     component: Layout,
+    meta: { title: '首页', icon: 'dashboard' },
     redirect: 'Dashboard',
     children: [
       {
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index'),
-        meta: { title: 'Dashboard', icon: 'dashboard' }
+        meta: { title: 'Dashboard', icon: 'dashboard' },
+        function:[{
+          title:"charts",
+          path:"charts"
+        }]
       }
     ]
   },
@@ -83,31 +89,37 @@ export const constantRoutes = [
     redirect: '/approval/token/list',
     name: 'Approval',
     meta: { title: '审核列表', icon: 'el-icon-s-help' },
+    children: [...TokenApproval]
+  },
+  {
+    path: '/userManagemen',
+    name: 'userManagemen',
+    component: Layout,
+    redirect: '/userManagemen/list',
+    meta: { title: '用户管理', icon: 'tree' },
     children: [
-      ...TokenApproval
+      {
+        path: 'list',
+        name: 'userManagemenList',
+        component: () => import('@/views/userManagemen/list.vue'),
+        meta: { title: '用户管理', icon: 'form' }
+      }
     ]
   },
-  
 
   {
     path: '/log',
     component: Layout,
+    meta: { title: '日志管理', icon: 'form' },
     children: [
       {
         path: 'index',
         name: 'Log',
         component: () => import('@/views/form/index'),
-        meta: { title: '日志管理', icon: 'form' }
+        meta: { title: '日志列表', icon: 'form' }
       }
     ]
   },
-
-  // {
-  //   path: 'tree',
-  //   name: 'Tree',
-  //   component: () => import('@/views/tree/index'),
-  //   meta: { title: 'Tree', icon: 'tree' }
-  // }
 
   // {
   //   path: '/nested',
@@ -180,7 +192,7 @@ export const constantRoutes = [
   // },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  { path: '*', redirect: '/404', hidden: true, hiddenPermission: true }
 ]
 
 export const asyncRoutes = []

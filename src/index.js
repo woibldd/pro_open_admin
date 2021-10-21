@@ -40,7 +40,7 @@ router.use(function(req, res, next) {
 
 app.use((req, res, next) => {
 	const url = req.url;
-	const openApiRegexStrs = ['^/open_admin/status/', '^/open_admin/user/login'];
+	const openApiRegexStrs = ['^/open_admin/status/', '^/open_admin/user/login', '^/' ];
 	
 	let needCheck = true;
 	for (const regex of openApiRegexStrs) {

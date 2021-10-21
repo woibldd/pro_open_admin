@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <ContainerHeader :title="$route.meta.title"/>
+    <ContainerHeader :title="$route.meta.title" />
     <div class="filter-container">
       <el-form :inline="true">
         <el-form-item label="关键字搜索">
@@ -46,14 +46,19 @@
           <span>{{ row.chain }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="合约地址(contract)" align="center"  show-overflow-tooltip>
+      <el-table-column label="合约地址(contract)" align="center" show-overflow-tooltip>
         <template slot-scope="{ row }">
-          <span @click.stop="handleCopy(row.contract, $event)" class="pointer" title="copy">{{row.contract || '--'}}</span>
+          <span @click.stop="handleCopy(row.contract, $event)" class="pointer" title="copy">{{ row.contract || '--' }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="提交用户(eth_address)"  align="center"  show-overflow-tooltip >
-        <template slot-scope="{ row }" >
-          <span  @click.stop="handleCopy(row.owner_eth_address, $event)" class="pointer" title="copy">{{ row.owner_eth_address || '--' }}</span>
+      <el-table-column label="提交用户(eth_address)" align="center" show-overflow-tooltip>
+        <template slot-scope="{ row }">
+          <span @click.stop="handleCopy(row.owner_eth_address, $event)" class="pointer" title="copy">{{ row.owner_eth_address || '--' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="审核状态" align="center">
+        <template slot-scope="{ row }">
+          <el-tag :type="row.status | appovalFilterColor">{{ row.status | appovalFilter }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="是否发布" align="center">
@@ -66,21 +71,17 @@
           {{ row.remark }}
         </template>
       </el-table-column>
-      <el-table-column label="审核状态" align="center">
-        <template slot-scope="{ row }">
-          <el-tag :type="row.status | appovalFilterColor">{{ row.status | appovalFilter }}</el-tag>
-        </template>
-      </el-table-column>
 
       <el-table-column label="操作" fixed="right" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini"  @click.stop="handleApproval(row, 'approval')">
+          
+          <el-button v-if='row.status==0'  type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
             审核通过
           </el-button>
-          <el-button  size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
+          <el-button  v-if='row.status==0' size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
             拒绝
           </el-button>
-          <el-button  size="mini"  @click.stop="$router.push(`/approval/token/detail/${row.id}`)">
+          <el-button size="mini" @click.stop="$router.push(`/approval/token/detail/${row.id}`)">
             查看
           </el-button>
         </template>
@@ -120,7 +121,7 @@
         <!-- <el-form-item label="总市值">
           <span>{{ appovalFormData.data.contract }}</span>
         </el-form-item> -->
-        <el-form-item v-if="appovalFormData.type != 'approval'" label="拒绝原因" :rules="[{ required: true, message: '请填写拒绝原因' }]" style="max-width:100%">
+        <el-form-item v-if="appovalFormData.type != 'approval'"   prop='remark' label="拒绝原因" :rules="[{ required: true, message: '请填写拒绝原因' }]" style="max-width:100%">
           <el-input style="max-width:100%" v-model="appovalFormData.remark" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="请填写拒绝原因" />
         </el-form-item>
       </el-form>
@@ -128,7 +129,7 @@
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="submitApproval" :loading="submitLoading">
+        <el-button :type="appovalFormData.type == 'approval' ?'primary':'danger'" @click="submitApproval" :loading="submitLoading">
           {{ appovalFormData.type == 'approval' ? '审核通过' : '拒绝审核' }}
         </el-button>
       </div>
@@ -141,7 +142,7 @@ import { getList, verify } from '@/api/token'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-import ContainerHeader from '@/components/ContainerHeader' 
+import ContainerHeader from '@/components/ContainerHeader'
 import clip from '@/utils/clipboard'
 const calendarTypeOptions = [
   { key: 0, display_name: '审核中', tagtype: 'warn' },
@@ -177,7 +178,7 @@ export default {
   },
   data() {
     return {
-      submitLoading:false,
+      submitLoading: false,
       tableKey: 0,
       list: [],
       total: 0,
@@ -221,11 +222,12 @@ export default {
   },
   created() {
     this.getList()
-    window.$router = this.$router
   },
   methods: {
-    getList() {
-      this.listLoading = true
+    getList(noLoading) {
+      if(!noLoading){
+        this.listLoading = true
+      }
       getList(this.listQuery).then(response => {
         this.list = response.data.list
         this.total = response.data.total
@@ -241,7 +243,7 @@ export default {
       this.getList()
     },
     handleCopy(text, event) {
-      clip(text,  event)
+      clip(text, event)
     },
     handleRowClick({ id }) {
       this.$router.push(`/approval/token/detail/${id}`)
@@ -274,16 +276,23 @@ export default {
         if (!valid) return
         const { data, type, remark } = this.appovalFormData
         this.submitLoading = true
-        verify({ id: data.id, status: type == 'approval' ? 1 : 0, remark }).then(res => {
-          this.handleFilter()
-          this.$notify({
-            title: '提示',
-            message: '提交成功',
-            type: 'success',
-            duration: 2000
+        verify({ id: data.id, status: type == 'approval' ? 1 : 2, remark })
+          .then(res => {
+            this.handleFilter()
+            this.$notify({
+              title: '提示',
+              message: '提交成功',
+              type: 'success',
+              duration: 2000
+            })
+            this.submitLoading = false
+            this.dialogFormVisible = false
+           
           })
-           this.submitLoading = false
-        }).catch(err=> this.submitLoading = false)
+          .catch(err => {
+            this.submitLoading = false
+            this.getList(true)
+          })
       })
     },
 

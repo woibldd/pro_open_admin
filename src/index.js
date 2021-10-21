@@ -12,7 +12,7 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 const router = express.Router();
-router.use(express.static(__dirname + '/dist'));
+router.use('/admin', express.static(__dirname + '/dist'));
 router.use(function(req, res, next) {
 	var ts = new Date().getTime();
 	console.log('\n');
@@ -40,7 +40,7 @@ router.use(function(req, res, next) {
 
 app.use((req, res, next) => {
 	const url = req.url;
-	const openApiRegexStrs = ['^/open_admin/status/', '^/open_admin/user/login', '^/' ];
+	const openApiRegexStrs = ['^/open_admin/status/', '^/open_admin/user/login', '^/admin' ];
 	
 	let needCheck = true;
 	for (const regex of openApiRegexStrs) {

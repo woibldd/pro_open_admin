@@ -1,7 +1,7 @@
 # @host = http://localhost:8888/open_admin
 @host=http://106.75.67.107:8888/open_admin
 @content-json-type = application/json
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNDYzNTgxMCwiZXhwIjoxNjM0NjcxODEwfQ.siuvb8Mt6fk1X3svNCM9Usr-zwQJ3cgqQMVSy5zA76Q
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNDc4NDk4MiwiZXhwIjoxNjM0ODIwOTgyfQ.jWfGhjMOEvsJDIjrc7_bPZrgCkyUziu9ASPRFF5QrYk
 
 ### 获取Token列表
 GET {{host}}/token/list HTTP/1.1
@@ -20,6 +20,6 @@ token: {{token}}
 
 {
     "id": 1,
-    "status": 2,
+    "status": 1,
     "remark": "token名称错误"
 }

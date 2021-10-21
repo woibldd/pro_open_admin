@@ -42,3 +42,20 @@ token: {{token}}
     "pageNum": 1,
     "pageSize": 10
 }
+
+
+### ms_language batchPost
+POST http://localhost:8893/batchPost HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "module": "open",
+    "table": "Token",
+    "data": [{"lang":"en","id":1,"data":{"name":"23"}},{"data":{"name":"123cn"},"lang":"cn","id":1},{"data":{"name":"123dn"},"lang":"dn","id":1}]
+}
+
+### ms_language batchGet
+GET http://localhost:8893/batchGet?module=open&table=token&id=1 HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}

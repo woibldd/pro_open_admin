@@ -194,6 +194,64 @@ token: {{token}}
 }
 ```
 
+### 3. 获取token详情
+GET /open/token/detail
+
+request
+```json
+{
+  "id": Number
+}
+```
+
+response
+```json
+{
+  "status": 0,
+  "data": {
+    "id": Number,
+    "status": Number,
+    "is_online": Number,
+    "coin_id": NUmber,
+    "language": String,
+    "name": String,
+    "coin": String,
+    "chain": String,
+    "contract": String,
+    "icon": String,
+    "price_from": String,
+    "about": String,
+    "supply_total": String,
+    "decimals": Number,
+    "website": String,
+    "whitepaper": String,
+    "twitter": String,
+    "github": String,
+    "telegram": String,
+    "facebook": String,
+    "remark": String,
+    "tools": String,
+    "create_time": String,
+    "update_time": String,
+    "multiLanguageList": [
+      {
+        "lang": String,
+        "id": String,
+        "data": {
+          "name": String,
+          "about": String,
+          "whitepaper": String,
+          "tools": String,
+          "browser_account": String,
+          "browser_tx": String,
+          "browser_quote": String
+        }
+      }
+    ]
+  }
+}
+```
+
 # 三、 操作记录
 
 ### 1. 获取操作记录列表

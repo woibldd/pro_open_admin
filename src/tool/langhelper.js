@@ -36,4 +36,27 @@ module.exports = class Helper {
         });
     }
 
+    static async batchSet(module, table, data){
+        return await Nethelper.post({
+            url: `${CONFIG.host_language}/batchPost`,
+            json: true,
+            body: {
+                module: module || MODULE,
+                table: table,
+                data: JSON.stringify(data)
+            }
+        });
+    }
+    
+    static async batchGet(table, data){
+        const ids = [];
+        if(!data || data.length == 0) return data;
+        if(!table) return data;
+        for(var it of data){
+            if(!it.id) throw new Error('Lost id for language');
+            ids.push(it.id);
+        }
+        return await Nethelper.get(`${CONFIG.host_language}/batchGet?module=${MODULE}&table=${table}&id=${ids.join(',')}`);
+    }
+
 }

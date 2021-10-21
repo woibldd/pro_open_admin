@@ -1,6 +1,7 @@
 const CoreController = require('./controller.core');
 const DBhelper = require('../tool/dbhelper');
 const NetHelper = require('../tool/nethelper');
+const LanguageHelper = require('../tool/langhelper');
 const TokenStatus = require('../enum/tokenStatus');
 const OperationService = require('../service/service.operation');
 
@@ -38,10 +39,17 @@ module.exports = class TokenController extends CoreController {
         this._checkParams(params, ['id']);
         const { id } = params;
 
-        return await DBhelper.queryMysql(MYSQL_OPEN, {
+        const tokens = await DBhelper.queryMysql(MYSQL_OPEN, {
             sql: `SELECT * FROM Token WHERE id = ?`,
             values: [parseInt(id)]
         });
+        const token = tokens && tokens[0];
+        if (!token) throw new Error('Token not found');
+        delete token.owner_eth_address;
+        delete token.search_key;
+
+        token.multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
+        return token;
     }
 
     /**
@@ -145,6 +153,22 @@ module.exports = class TokenController extends CoreController {
                 values: [ status, remark || '', id ]
             });
         }
+
+        // 多语言同步
+        const multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
+        if (!multiLanguageList || multiLanguageList.length == 0) return true;
+
+        await LanguageHelper.batchSet('coin', 'Coins', multiLanguageList.map(_ => {
+            const data = _.data;
+            data.browserAccount = data.browser_account;
+            data.browserTx = data.browser_tx;
+            data.browserQuote = data.browser_quote;
+            delete data.browser_account;
+            delete data.browser_tx;
+            delete data.browser_quote;
+            _.data = data;
+            return _;
+        }));
         
         return true;
     }

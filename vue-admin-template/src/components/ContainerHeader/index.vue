@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'containerheader',
+  name: 'ContainerHeader',
   props: {
       title:{
           type:String,

@@ -26,8 +26,14 @@ export default {
   overflow: hidden;
   padding: 20px;
   box-sizing: border-box;
+
 }
 
+/* .app-main #container-footer-content.fixed{
+      position: absolute;
+      bottom:40px;
+      left: ;
+} */
 .fixed-header+.app-main {
   padding-top: 70px;
 }

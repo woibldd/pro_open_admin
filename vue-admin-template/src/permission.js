@@ -1,4 +1,4 @@
-import router from './router'
+import router,{ generateRoutePermission , resetRouter,  asyncRoutes} from './router'
 import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
@@ -9,6 +9,7 @@ import getPageTitle from '@/utils/get-page-title'
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['/login'] // no redirect whitelist
+
 
 router.beforeEach(async(to, from, next) => {
 
@@ -25,17 +26,25 @@ router.beforeEach(async(to, from, next) => {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
+
       NProgress.done()
     } else {
-      const hasGetUserInfo = store.getters.name
+      debugger
+      // await store.dispatch('user/getInfo')
+      const hasGetUserInfo = store.getters.loginName
       if (hasGetUserInfo) {
         next()
       } else {
         try {
           // get user info
-          // await store.dispatch('user/getInfo')
+          await store.dispatch('user/getInfo')
+          const accessRoutes = await store.dispatch('user/generateRoutes',  store.getters.permission)
 
-          next()
+          router.addRoutes(accessRoutes)
+          
+          if(!store.getters.loginName) throw 'loginName is not found!!'
+
+          next({ ...to, replace: true })
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
@@ -66,31 +75,4 @@ router.afterEach(() => {
 
 
 
-export function generatePermission(arr,parent={permission:""}) {
-  return arr
-    .filter(route => !route.hiddenPermission)
-    .map(route => {
-      let children = []
-      const permission=  parent.permission && parent.permission!='/' ? `${parent.permission}/${route.path}`: route.path
-      if (route.children && route.children.length > 0) {
-        children = generatePermission(route.children, { permission })        
-      }
-      
-      if(route.function && route.function.length>0){
-          children.push(...route.function.map(v=>{
-                  return {
-                      ...v,
-                      isFunction:true,
-                      title: v.title,
-                      permission: `${permission}:${v.path}`
-                  }
-          }))
-      }
-      return {
-        ...route,
-        title: route.meta ? route.meta.title : route.path,
-        children: children,
-        permission: permission,
-      }
-    })
-}
+

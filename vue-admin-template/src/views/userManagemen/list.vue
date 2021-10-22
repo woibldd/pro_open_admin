@@ -41,7 +41,7 @@
     </el-table>
 
     <!-- <ContainerFooter> -->
-      <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList" />
+    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList" />
     <!-- </ContainerFooter> -->
 
     <el-dialog :title="dialogType === 'edit' ? '编辑用户' : '添加用户'" :visible.sync="dialogFormVisible">
@@ -55,11 +55,20 @@
         <!-- <el-form-item label="用户描述">
           <el-input v-model="userData.description" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="用户描述" />
         </el-form-item> -->
-
-        <el-divider class="title">用户权限</el-divider>
-        <!-- <el-checkbox v-model="checked">全选</el-checkbox> -->
-        <el-tree ref="tree" :check-strictly="checkStrictly" :data="routesData" :props="defaultProps" show-checkbox node-key="permission" class="permission-tree" />
+        <div
+          v-if="
+            !(userData.permission || '')
+              .trim()
+              .split(',')
+              .includes('admin')
+          "
+        >
+          <el-divider class="title">用户权限</el-divider>
+          <!-- <el-checkbox v-model="checked">全选</el-checkbox> -->
+          <el-tree ref="tree" :check-strictly="checkStrictly" :data="permissionTree" :props="defaultProps" show-checkbox node-key="permission" class="permission-tree" />
+        </div>
       </el-form>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           取消
@@ -80,8 +89,8 @@ import Pagination from '@/components/Pagination' // secondary package based on e
 import ContainerHeader from '@/components/ContainerHeader'
 import ContainerFooter from '@/components/ContainerFooter'
 import clip from '@/utils/clipboard'
-import { generatePermission } from '@/permission'
-
+import { generatePermission } from '@/router'
+import { mapGetters } from 'vuex'
 const calendarTypeOptions = [
   { key: 0, display_name: '审核中', tagtype: 'warn' },
   { key: 1, display_name: '审核通过', tagtype: 'success' },
@@ -96,11 +105,14 @@ const initUserData = {
   id: '',
   loginName: '',
   password: '',
-  permission: []
+  permission: ''
 }
 
 export default {
   name: 'userList',
+  computed: {
+    ...mapGetters(['permission_routes', 'permissionTree', 'permission'])
+  },
   components: { Pagination, ContainerHeader, ContainerFooter },
   directives: { waves },
   filters: {
@@ -125,12 +137,7 @@ export default {
       return tagtype
     }
   },
-  computed: {
-    routesData() {
-      const routes = this.$router.options.routes
-      return generatePermission(routes)
-    }
-  },
+
   data() {
     return {
       TableColumus,
@@ -230,7 +237,8 @@ export default {
 
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
-        this.$refs.tree.setCheckedKeys(this.userData.permission)
+        const permissions = (this.userData.permission || '').split(',')
+        this.$refs.tree.setCheckedKeys(permissions)
         window.$refs = this
       })
     },
@@ -240,7 +248,7 @@ export default {
         this.submitLoading = true
         const { loginName, password, id } = this.userData
         const permission = this.$refs.tree.getCheckedKeys()
-        const requetst = this.dialogType == 'edit' ? update({ id, loginName, password, permission }) : update({ loginName, password, permission })
+        const requetst = this.dialogType == 'edit' ? update({ id, loginName, password, permission: permission.join(',') }) : update({ loginName, password, permission: permission.join(',') })
         requetst
           .then(res => {
             this.getList(true)

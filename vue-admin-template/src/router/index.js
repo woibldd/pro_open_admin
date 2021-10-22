@@ -1,11 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-Vue.use(Router)
-
 /* Layout */
 import Layout from '@/layout'
 
+Vue.use(Router)
 /**
  * Note: sub-menu only appear when route children.length >= 1
  * Detail see: https://panjiachen.github.io/vue-element-admin-site/guide/essentials/router-and-nav.html
@@ -30,7 +29,56 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+//  权限选择
+export function generatePermission(arr, parent = { permission: '' }) {
+  return arr
+    .filter(route => !route.hiddenPermissionSetting)
+    .map(route => {
+      let children = []
+      const permission = parent.permission && parent.permission != '/' ? `${parent.permission}/${route.path}` : route.path
+      if (route.children && route.children.length > 0) {
+        children = generatePermission(route.children, { permission })
+      }
 
+      if (route.function && route.function.length > 0) {
+        children.push(
+          ...route.function.map(v => {
+            return {
+              ...v,
+              isFunction: true,
+              title: v.title,
+              permission: `${permission}:${v.path}`
+            }
+          })
+        )
+      }
+      return {
+        ...route,
+        title: route.meta ? route.meta.title : route.path,
+        children: children,
+        permission: permission
+      }
+    })
+}
+//陆游权限
+export function generateRoutePermission(arr, parent = { permission: '' }, permissionsKeys = '', isAll) {
+  return arr
+    .map(route => {
+      const permission = parent.permission && parent.permission != '/' ? `${parent.permission}/${route.path}` : route.path
+      if (!permissionsKeys.split(',').includes(permission) && !isAll && !route.default) return 'nosupport'
+      let children = []
+      if (route.children && route.children.length > 0) {
+        children = generateRoutePermission(route.children, { permission }, permissionsKeys, isAll)
+      }
+      return {
+        ...route,
+        // title: route.meta ? route.meta.title : route.path,
+        children: children.filter(v => v != 'nosupport'),
+        permission: permission
+      }
+    })
+    .filter(v => v != 'nosupport')
+}
 //审核
 // token
 export const TokenApproval = [
@@ -49,76 +97,56 @@ export const TokenApproval = [
   }
 ]
 
+export const NFTApproval = [
+  {
+    path: 'NFT/list',
+    name: 'Token',
+    component: () => import('@/views/approval/token/list'),
+    meta: { title: 'NFT审核列表', icon: 'table' }
+  },
+  {
+    path: 'NFT/detail/:id',
+    name: 'tokenDetail',
+    hidden: true,
+    component: () => import('@/views/approval/token/detail'),
+    meta: { title: 'NFT详情', icon: 'table' }
+  }
+]
+
 export const constantRoutes = [
-  {
-    path: '/login',
-    component: () => import('@/views/login/index'),
-    hidden: true,
-    hiddenPermission: true
-  },
-
-  {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true,
-    hiddenPermission: true
-  },
-
   {
     path: '/',
     component: Layout,
     meta: { title: '首页', icon: 'dashboard' },
-    redirect: 'Dashboard',
+    redirect: '/dashboard',
     children: [
       {
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index'),
         meta: { title: 'Dashboard', icon: 'dashboard' },
-        function:[{
-          title:"charts",
-          path:"charts"
-        }]
+        function: [
+          {
+            title: 'charts',
+            path: 'charts'
+          }
+        ]
       }
     ]
   },
 
   {
-    path: '/approval',
-    component: Layout,
-    redirect: '/approval/token/list',
-    name: 'Approval',
-    meta: { title: '审核列表', icon: 'el-icon-s-help' },
-    children: [...TokenApproval]
-  },
-  {
-    path: '/userManagemen',
-    name: 'userManagemen',
-    component: Layout,
-    redirect: '/userManagemen/list',
-    meta: { title: '用户管理', icon: 'tree' },
-    children: [
-      {
-        path: 'list',
-        name: 'userManagemenList',
-        component: () => import('@/views/userManagemen/list.vue'),
-        meta: { title: '用户管理', icon: 'form' }
-      }
-    ]
+    path: '/login',
+    component: () => import('@/views/login/index'),
+    hidden: true,
+    hiddenPermissionSetting: true
   },
 
   {
-    path: '/log',
-    component: Layout,
-    meta: { title: '日志管理', icon: 'form' },
-    children: [
-      {
-        path: 'index',
-        name: 'Log',
-        component: () => import('@/views/form/index'),
-        meta: { title: '日志列表', icon: 'form' }
-      }
-    ]
+    path: '/404',
+    component: () => import('@/views/404'),
+    hidden: true,
+    hiddenPermissionSetting: true
   },
 
   // {
@@ -192,17 +220,59 @@ export const constantRoutes = [
   // },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true, hiddenPermission: true }
+
 ]
 
-export const asyncRoutes = []
+export const asyncRoutes = [
+  {
+    path: '/approval',
+    component: Layout,
+    // redirect: '/approval/token/list',
+    name: 'Approval',
+    meta: { title: '审核列表', icon: 'el-icon-s-help' },
+    children: [...TokenApproval, ...NFTApproval]
+  },
+  {
+    path: '/userManagemen',
+    name: 'userManagemen',
+    component: Layout,
+    redirect: '/userManagemen/list',
+    meta: { title: '用户管理', icon: 'tree' },
+    children: [
+      {
+        path: 'list',
+        name: 'userManagemenList',
+        component: () => import('@/views/userManagemen/list.vue'),
+        meta: { title: '用户管理', icon: 'form' }
+      }
+    ]
+  },
 
-const createRouter = () =>
-  new Router({
+  {
+    path: '/log',
+    component: Layout,
+    meta: { title: '日志管理', icon: 'form' },
+    children: [
+      {
+        path: 'index',
+        name: 'Log',
+        component: () => import('@/views/form/index'),
+        meta: { title: '日志列表', icon: 'form' }
+      }
+    ]
+  },
+  { path: '*', redirect: '/404', hidden: true, default: true , hiddenPermissionSetting:true}
+]
+
+const createRouter = () =>{
+  const routes = generateRoutePermission(constantRoutes, { permission: '' }, '', true)
+  return  new Router({
     // mode: 'history', // require service support
     scrollBehavior: () => ({ y: 0 }),
-    routes: constantRoutes
+    routes
   })
+}
+ 
 
 const router = createRouter()
 

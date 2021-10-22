@@ -28,11 +28,12 @@ export default {
   components: { SidebarItem, Logo },
   computed: {
     ...mapGetters([
-      'sidebar'
+      'sidebar',
+      "permission_routes"
     ]),
     routes() {
-      console.log("///",this.$router.options.routes)
-      return this.$router.options.routes
+      // console.log("///",this.$router.options.routes)
+      return  this.permission_routes
     },
     activeMenu() {
       const route = this.$route

@@ -227,7 +227,7 @@ export const asyncRoutes = [
   {
     path: '/approval',
     component: Layout,
-    // redirect: '/approval/token/list',
+    redirect: '/approval/token/list',
     name: 'Approval',
     meta: { title: '审核列表', icon: 'el-icon-s-help' },
     children: [...TokenApproval, ...NFTApproval]
@@ -249,14 +249,15 @@ export const asyncRoutes = [
   },
 
   {
-    path: '/log',
+    path: '/operation',
     component: Layout,
+    redirect: '/operation/list',
     meta: { title: '日志管理', icon: 'form' },
     children: [
       {
-        path: 'index',
-        name: 'Log',
-        component: () => import('@/views/form/index'),
+        path: 'list',
+        name: 'operationList',
+        component: () => import('@/views/operation/list.vue'),
         meta: { title: '日志列表', icon: 'form' }
       }
     ]

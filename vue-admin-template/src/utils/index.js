@@ -52,6 +52,9 @@ export function parseTime(time, cFormat) {
   return time_str
 }
 
+export function UpperCase(text=''){
+       return  text.toUpperCase()
+}
 export const parseUA = userAgent => {
   const ua = userAgent || navigator.userAgent || window.navigator.userAgent
   const isIosEnv = !!ua.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)

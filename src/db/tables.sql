@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `User` (
     `loginName` varchar(100) NOT NULL DEFAULT '' COMMENT '登录名称',
     `password` varchar(100) NOT NULL DEFAULT '' COMMENT '密码',
     `roleId` varchar(100) NOT NULL DEFAULT '' COMMENT '角色id',
+	`permission` text NOT NULL DEFAULT '' COMMENT '权限',
 	`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   	`update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   	PRIMARY KEY (`id`),

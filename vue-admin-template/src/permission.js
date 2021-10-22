@@ -29,7 +29,6 @@ router.beforeEach(async(to, from, next) => {
 
       NProgress.done()
     } else {
-      debugger
       // await store.dispatch('user/getInfo')
       const hasGetUserInfo = store.getters.loginName
       if (hasGetUserInfo) {

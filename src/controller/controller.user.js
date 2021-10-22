@@ -37,6 +37,7 @@ module.exports = class UserController extends CoreController {
         });
         return {
            jwtToken,
+           permssion: user.permission,
            expires: 60000*60*9.8 + Date.now()
         }
     }
@@ -62,23 +63,38 @@ module.exports = class UserController extends CoreController {
         }
     }
    
-    async update (params) {
-        this._checkParams(params, ['sessionId', 'loginName', 'password']);
+    async detail (params) {
+        this._checkParams(params, ['sessionId']);
+        const { sessionId } = params;
 
-        const { id, sessionId, loginName, password } = params;
+        const result = await DBhelper.queryMysql(MYSQL, {
+            sql: `SELECT * FROM User WHERE id=?`,
+            values: [ sessionId ]
+        });
+        if (!result || result.length == 0) {
+            throw new Error('User not found');
+        }
+
+        return result[0];
+    }
+
+    async update (params) {
+        this._checkParams(params, ['sessionId', 'loginName', 'password', 'permission']);
+
+        const { id, sessionId, loginName, password, permission } = params;
 
         if (!id) {
             await DBhelper.queryMysql(MYSQL, {
-                sql: `INSERT INTO User(loginName, password)
-                    VALUES(?, ?)`,
-                values: [ loginName, MD5(password) ]
+                sql: `INSERT INTO User(loginName, password, permission)
+                    VALUES(?, ?, ?)`,
+                values: [ loginName, MD5(password), permission ]
             });
 
             await this.operationService.insertOperation(sessionId, `添加新用户[${loginName}]`);
         } else {
             await DBhelper.queryMysql(MYSQL, {
-               sql: `UPDATE User set password=? WHERE id=? `,
-               values: [ MD5(password), id ]
+               sql: `UPDATE User set password=?, permission=? WHERE id=? `,
+               values: [ MD5(password), permission, id ]
             });
             await this.operationService.insertOperation(sessionId, `更新用户[${loginName}]密码`);
         }

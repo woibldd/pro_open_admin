@@ -13,13 +13,23 @@ token: {{token}}
     "pageSize": 10
 }
 
+
+### 获取Token详情
+GET {{host}}/token/detail HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "id": 39
+}
+
 ### 审核Token
 POST {{host}}/token/verify HTTP/1.1
 content-type: {{content-json-type}}
 token: {{token}}
 
 {
-    "id": 1,
+    "id": 38,
     "status": 1,
     "remark": "token名称错误"
 }

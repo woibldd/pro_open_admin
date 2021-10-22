@@ -74,11 +74,10 @@
 
       <el-table-column label="操作" fixed="right" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
-          
-          <el-button v-if='row.status==0'  type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
+          <el-button v-if="row.status == 0" type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
             审核通过
           </el-button>
-          <el-button  v-if='row.status==0' size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
+          <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
             拒绝
           </el-button>
           <el-button size="mini" @click.stop="$router.push(`/approval/token/detail/${row.id}`)">
@@ -87,8 +86,9 @@
         </template>
       </el-table-column>
     </el-table>
-
-    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList" />
+    <!-- <ContainerFooter> -->
+      <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
+    <!-- </ContainerFooter> -->
 
     <el-dialog :title="appovalFormData.type != 'approval' ? '拒绝审核' : '审核通过'" :visible.sync="dialogFormVisible">
       <el-form :model="appovalFormData" ref="dataForm" label-position="right" label-width="80px">
@@ -121,7 +121,7 @@
         <!-- <el-form-item label="总市值">
           <span>{{ appovalFormData.data.contract }}</span>
         </el-form-item> -->
-        <el-form-item v-if="appovalFormData.type != 'approval'"   prop='remark' label="拒绝原因" :rules="[{ required: true, message: '请填写拒绝原因' }]" style="max-width:100%">
+        <el-form-item v-if="appovalFormData.type != 'approval'" prop="remark" label="拒绝原因" :rules="[{ required: true, message: '请填写拒绝原因' }]" style="max-width:100%">
           <el-input style="max-width:100%" v-model="appovalFormData.remark" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="请填写拒绝原因" />
         </el-form-item>
       </el-form>
@@ -129,7 +129,7 @@
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button :type="appovalFormData.type == 'approval' ?'primary':'danger'" @click="submitApproval" :loading="submitLoading">
+        <el-button :type="appovalFormData.type == 'approval' ? 'primary' : 'danger'" @click="submitApproval" :loading="submitLoading">
           {{ appovalFormData.type == 'approval' ? '审核通过' : '拒绝审核' }}
         </el-button>
       </div>
@@ -143,16 +143,17 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import ContainerHeader from '@/components/ContainerHeader'
+import ContainerFooter from '@/components/ContainerFooter'
 import clip from '@/utils/clipboard'
 const calendarTypeOptions = [
   { key: 0, display_name: '审核中', tagtype: 'warn' },
   { key: 1, display_name: '审核通过', tagtype: 'success' },
-  { key: 2, display_name: '审核失败', tagtype: 'danger' }
+  { key: 2, display_name: '审核拒绝', tagtype: 'danger' }
 ]
 
 export default {
   name: 'tokenList',
-  components: { Pagination, ContainerHeader },
+  components: { Pagination, ContainerHeader, ContainerFooter },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -225,7 +226,7 @@ export default {
   },
   methods: {
     getList(noLoading) {
-      if(!noLoading){
+      if (!noLoading) {
         this.listLoading = true
       }
       getList(this.listQuery).then(response => {
@@ -287,7 +288,6 @@ export default {
             })
             this.submitLoading = false
             this.dialogFormVisible = false
-           
           })
           .catch(err => {
             this.submitLoading = false

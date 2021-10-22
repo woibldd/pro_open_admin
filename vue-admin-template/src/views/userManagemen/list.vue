@@ -40,7 +40,9 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList" />
+    <!-- <ContainerFooter> -->
+      <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList" />
+    <!-- </ContainerFooter> -->
 
     <el-dialog :title="dialogType === 'edit' ? '编辑用户' : '添加用户'" :visible.sync="dialogFormVisible">
       <el-form :model="userData" ref="dataForm" label-position="right" label-width="80px">
@@ -76,6 +78,7 @@ import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import ContainerHeader from '@/components/ContainerHeader'
+import ContainerFooter from '@/components/ContainerFooter'
 import clip from '@/utils/clipboard'
 import { generatePermission } from '@/permission'
 
@@ -93,12 +96,12 @@ const initUserData = {
   id: '',
   loginName: '',
   password: '',
-  permission:[]
+  permission: []
 }
 
 export default {
   name: 'userList',
-  components: { Pagination, ContainerHeader },
+  components: { Pagination, ContainerHeader, ContainerFooter },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -224,17 +227,15 @@ export default {
       this.dialogFormVisible = true
       this.dialogType = type
       this.userData = type == 'edit' ? Object.assign(initData, row) : initData
-     
+
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
         this.$refs.tree.setCheckedKeys(this.userData.permission)
-        window.$refs =this
+        window.$refs = this
       })
     },
     async handleSave() {
-      
       this.$refs['dataForm'].validate(valid => {
-     
         if (!valid) return
         this.submitLoading = true
         const { loginName, password, id } = this.userData

@@ -26,26 +26,29 @@
     </div>
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @sort-change="sortChange" @row-click="handleRowClick">
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column  label="ID"  fixed='left' prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
         <template slot-scope="{ row }">
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="icon图标" align="center">
+      <el-table-column label="icon图标"  fixed='left' align="center">
         <template slot-scope="{ row }">
           <el-image style="width: 40px; height: 40px; border-radius:50%" :src="row.icon" fit="contain"></el-image>
         </template>
       </el-table-column>
-      <el-table-column label="币名(symbol)" align="center">
+      <el-table-column label="币名(symbol)"  fixed='left'  align="center">
         <template slot-scope="{ row }">
           {{ row.coin }}
         </template>
       </el-table-column>
-      <el-table-column label="主链(chain)" width="110px" align="center">
+      <el-table-column label="主链(chain)"  fixed='left' width="110px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.chain }}</span>
         </template>
       </el-table-column>
+
+     
+      
       <el-table-column label="合约地址(contract)" align="center" show-overflow-tooltip>
         <template slot-scope="{ row }">
           <span @click.stop="handleCopy(row.contract, $event)" class="pointer" title="copy">{{ row.contract || '--' }}</span>
@@ -71,6 +74,11 @@
           {{ row.remark }}
         </template>
       </el-table-column>
+       <el-table-column label="更新时间"  width="110px" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.update_time  | parseTime}}</span>
+        </template>
+      </el-table-column>
 
       <el-table-column label="操作" fixed="right" align="center" width="230" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
@@ -86,9 +94,13 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <div style="height:100px"></div>
     <!-- <ContainerFooter> -->
-      <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
+    <pagination v-show="total > 0"  class="footer-pagination" align="right"  :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
     <!-- </ContainerFooter> -->
+  
+  
 
     <el-dialog :title="appovalFormData.type != 'approval' ? '拒绝审核' : '审核通过'" :visible.sync="dialogFormVisible">
       <el-form :model="appovalFormData" ref="dataForm" label-position="right" label-width="80px">
@@ -156,6 +168,9 @@ export default {
   components: { Pagination, ContainerHeader, ContainerFooter },
   directives: { waves },
   filters: {
+    // parseTime(val=''){
+    //   return parseTime(val).substr(-)
+    // },
     statusFilter(status) {
       const statusMap = {
         published: 'success',

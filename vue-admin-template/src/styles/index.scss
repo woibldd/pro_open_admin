@@ -136,6 +136,12 @@ aside {
   margin-top: 30px;
 }
 
+.footer-pagination{
+  position: fixed;
+  right: 40px;
+  bottom: 20px;
+  z-index: 100
+}
 .text-center {
   text-align: center
 }

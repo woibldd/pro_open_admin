@@ -10,25 +10,30 @@
         <el-tag class="chain" size="small" type="info" style="margin-right:5px">{{ dataInfo.chain }}</el-tag>
         <el-tag size="small" type="info" v-if="dataInfo.contract || dataInfo.contract.length == 2">代币</el-tag>
 
-        <el-select v-model="dataInfo.lang" placeholder="语言展示" class="lang">
-          <el-option v-for="item in languageTypeOptions" :key="item.key" :label="item.display_name + '(' + item.key + ')'" :value="item.key" />
+        <el-select v-model="lang" placeholder="语言展示" class="lang" @change="langChange">
+          <el-option v-for="item in languageTypeOptions" :key="item.id" :label="item.lang" :value="item.id" />
         </el-select>
       </div>
       <div>
         <el-tag :type="dataInfo.status | appovalFilterColor">{{ dataInfo.status | appovalFilter }}</el-tag>
       </div>
     </div>
+     <div style='margin-top:30px' v-if="dataInfo.status == 2 && dataInfo.remark">
+      <el-alert type="error" >
+          拒绝原因： {{  dataInfo.remark }}
+      </el-alert>
+    </div>
     <el-form class="body" :inline="true" label-position="right">
       <div class="info">
         <el-divider class="title">基本信息</el-divider>
         <!-- <h3 class="title">基本信息</h3> -->
         <el-row :gutter="10" class="content">
-          <el-col  :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in IconColumus" :key="col.key">
+          <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in IconColumus" :key="col.key">
             <el-form-item :label="col.label || col.key" v-if="col.type == 'href'">
-              <el-link :href="col.value" target="_blank">{{ col.value }}</el-link>
+              <el-link :href="col.value" target="_blank">{{ col.filter ? col.filter(col.value) : col.value }}</el-link>
             </el-form-item>
             <el-form-item :label="col.label || col.key" v-else-if="col.type == 'image'">
-              <el-avatar  shape="circle" :size="30" fit="fit" :src="col.value" alt="alt"></el-avatar>
+              <el-avatar shape="circle" :size="30" fit="fit" :src="col.value" alt="alt"></el-avatar>
             </el-form-item>
             <el-form-item :label="col.label || col.key" v-else-if="col.type == 'array'">
               <el-col :xs="col.xs || 24" :sm="col.sm || 8">
@@ -38,7 +43,7 @@
               </el-col>
             </el-form-item>
             <el-form-item :label="col.label || col.key" v-else>
-              {{ col.value }}
+              {{ col.filter ? col.filter(col.value) : col.value }}
             </el-form-item>
           </el-col>
         </el-row>
@@ -46,7 +51,7 @@
         <el-divider class="title">token介绍</el-divider>
 
         <el-row :gutter="10" class="content">
-          <el-col   :xs="col.xs || 24" :sm="col.sm || 8" :span="col.span || 8" v-for="col in OtherColumus" :key="col.key">
+          <el-col :xs="col.xs || 24" :sm="col.sm || 8" :span="col.span || 8" v-for="col in OtherColumus" :key="col.key">
             <el-form-item :label="col.label || col.key">
               {{ col.value }}
             </el-form-item>
@@ -63,6 +68,8 @@
         </el-row>
       </div>
     </el-form>
+
+   
 
     <div class="footer">
       <el-button v-if="dataInfo.status == 0" type="danger" @click="refuse" :loading="submitLoading">
@@ -94,17 +101,16 @@
 <script>
 import ContainerHeader from '@/components/ContainerHeader'
 import { getDetails, verify } from '@/api/token'
-import { parseTime } from '@/utils'
+import { parseTime, UpperCase } from '@/utils'
 
-const languageTypeOptions = [{ key: 'en', display_name: '英文', tagtype: 'warn' }]
+const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
 
 const IconColumus = [
   { label: '货币:', key: 'coin', type: 'string', show: false, value: '' },
   { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
-  { label: '主链:', key: 'chain', type: 'string', show: false, value: '' },
+  { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: UpperCase },
   { label: '合约:', key: 'contract', type: 'string', show: false, value: '' },
-  { label: '全名:', key: 'name', type: 'string', show: false, value: '' },
-  
+  { label: '全名:', key: 'name', type: 'string', show: false, value: '' }
 
   // { label: '浏览器（账户）', key: 'coin', type: 'string', show: false, value: '' },
 ]
@@ -113,12 +119,11 @@ const OtherColumus = [
   { label: '精度:', key: 'decimals', type: 'string', show: false, value: '' },
   { label: '币价:', key: 'price', type: 'string', show: false, value: '' },
   { label: '币价来源:', key: 'price_from', type: 'string', show: false, value: '' },
-  { label: '货币介绍:', key: 'abort', span: 24, type: 'string', show: false, value: '' }
+  { label: '货币介绍:', key: 'about', span: 24, type: 'string', show: false, value: '' }
 ]
 
 const Other1Columus = [
   { label: '浏览器（TXID）:', key: 'browserTx', type: 'href', show: false, value: '' },
-  { label: '货币介绍:', key: 'abort', type: 'string', show: false, value: '' },
   { label: '白皮书地址:', key: 'whitepaper', type: 'href', show: false, value: '' },
   { label: '工具栏:', key: 'coin', type: 'string', show: false, value: '' }
 ]
@@ -134,8 +139,10 @@ export default {
   data() {
     return {
       languageTypeOptions,
+      lang:"en",
       dataInfo: {
-        lang: 'en'
+          multiLanguageList:[],
+          contract:''
       },
       formData: {
         remark: ''
@@ -172,9 +179,11 @@ export default {
         id: this.$route.params.id
       })
         .then(res => {
-          if (!res.data || res.data.length == 0) return
-          const data = res.data[0]
-          this.dataInfo = data
+          if (!res.data) return
+          const data = res.data
+          this.dataInfo = Object.assign(this.dataInfo, data)
+
+          this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length>0 ? data.multiLanguageList :[{ id: '', lang: 'en', data }]
           this.IconColumus = this.IconColumus.map(v => {
             if (data[v.key]) {
               v.show = true
@@ -191,6 +200,13 @@ export default {
           })
         })
         .catch(err => console.error(err))
+    },
+    async langChange(val){
+        const langData = this.languageTypeOptions.find(v=>v.id ==val)
+        if(langData && langData.data){
+            Object.assign( this.dataInfo, langData.data)
+        }
+      
     },
     async submitApproval(type) {
       if (type == 1) {

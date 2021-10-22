@@ -251,7 +251,7 @@ export default {
         const requetst = this.dialogType == 'edit' ? update({ id, loginName, password, permission: permission.join(',') }) : update({ loginName, password, permission: permission.join(',') })
         requetst
           .then(res => {
-            this.getList(true)
+            this.getList()
 
             this.$notify({
               title: '提示',
@@ -264,7 +264,7 @@ export default {
           })
           .catch(err => {
             this.submitLoading = false
-            this.getList(true)
+            this.getList()
           })
       })
     },

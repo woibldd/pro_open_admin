@@ -30,6 +30,7 @@
     "host_coin": "http://ms.coin:8892",
     "host_market": "http://ms.market:8886",
     "host_logger": "http://ms.price:8894",
+    "host_nft":"http://ms.nft:8885",
     "host_price": "http://ms.price:8895",
     "host_language": "http://ms.language:8893",
     "host_user": "http://ms.user:8881",

@@ -59,3 +59,73 @@ token: {{token}}
 GET http://localhost:8893/batchGet?module=open&table=token&id=1 HTTP/1.1
 content-type: {{content-json-type}}
 token: {{token}}
+
+### ms_user coutToken
+POST http://118.193.40.6:8872/open/coutToken HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "list": [
+        {
+            "chain": "hbc",
+            "contract": "HBCPNjcTEJptRqp84JjajLC2buH4DpCPywc1"
+        }, 
+        {
+            "chain": "trx",
+            "contract": "TYJrKPgqmuJgJYA9EkFsBZrMw2eGbb7zh1"
+        }
+    ]
+}
+
+
+### ms_chain coutTransfer
+POST http://118.193.40.6:8874/admin/countTransfer HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "list": [
+        {
+            "chain": "bnb",
+            "contract": "0x55d398326f99059ff775485246999027b3197955"
+        },
+        {
+            "chain": "trx",
+            "contract": "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+        },
+        {
+            "chain": "bnb",
+            "contract": "0xacfc95585d80ab62f67a14c566c1b7a49fe91167"
+        }
+    ]
+}
+
+
+### ms_chain send
+POST http://118.193.40.6:8874/chain/send HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "from": "from123",
+    "to": "to234",
+    "receiver": "",
+    "chain": "trx123",
+    "symbol": "123",
+    "contract": "0x123123123",
+    "amount": 0,
+    "memo": "memo",
+    "sig": ""
+}
+
+### ms_chain getTransferCount
+POST http://118.193.40.6:8874/chain/getTransferCount HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "from": "from123",
+    "chain": "trx123",
+    "date": "2021-10-25T18:40:30.404Z"
+}

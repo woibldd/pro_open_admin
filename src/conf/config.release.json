@@ -28,6 +28,7 @@
     "host_dapp": "http://ms.defi:8884",
     "host_chain": "http://ms.chain:8891",
     "host_coin": "http://ms.coin:8892",
+    "host_nft":"http://ms.nft:8885",
     "host_market": "http://ms.market:8886",
     "host_logger": "http://ms.price:8894",
     "host_price": "http://ms.price:8895",

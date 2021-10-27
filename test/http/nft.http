@@ -1,0 +1,35 @@
+# @host = http://localhost:8888/open_admin
+@host=http://106.75.67.107:8888/open_admin/nft
+@content-json-type = application/json
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNTMxNjUxMywiZXhwIjoxNjM1MzUyNTEzfQ.27CA9ytIDsnBgqfLm96DF4yGNBkhonf44_DG0k-3OBQ
+
+### 1. 获取NFT列表
+GET {{host}}/list HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "pageNum": 1,
+    "pageSize": 10
+}
+
+
+### 2. 获取NFT详情
+GET {{host}}/detail HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "id": 2
+}
+
+### 3. 审核NFT
+POST {{host}}/verify HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "id": 1,
+    "status": 1,
+    "remark": ""
+}

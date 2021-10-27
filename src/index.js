@@ -101,6 +101,7 @@ function registerController(lib){
 registerController('./controller/controller.status');
 registerController('./controller/controller.user');
 registerController('./controller/controller.token');
+registerController('./controller/controller.nft');
 registerController('./controller/controller.operation');
 
 router.use(function(req, res){

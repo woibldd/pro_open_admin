@@ -285,3 +285,100 @@ response:
   }
 }
 ```
+
+# 四、 NFT
+
+// dev host
+@host=http://106.75.67.107:8888/open_admin/nft
+
+### 1. 获取NFT列表
+GET {{host}}/list HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+request:
+```json
+{
+    "pageNum": Number,
+    "pageSize": Number
+}
+```
+
+response:
+```json
+{
+  "status": Number,
+  "data": {
+    "total": Number,
+    "list": [
+      {
+        "id": ,
+        "owner_eth_address": String,
+        "is_online": String,
+        "collection_id": String,
+        "search_key": String,
+        "title": String,
+        "introduction": String,
+        "chain": String,
+        "contract": String,
+        "image_url_cdn": String,
+        "status": String,
+        "remark": String,
+        "channel": String,
+        "items_number": String,
+        "birthday_time": String,
+        "sort": String,
+        "create_time": String,
+        "update_time": String
+      }
+    ]
+  }
+}
+```
+
+### 2. 获取NFT详情
+GET {{host}}/detail HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+request:
+```json
+{
+    "id": 2
+}
+```
+
+response:
+```json
+{
+  "status": Number,
+  "data": {
+    "id": Number,
+    "is_online": Number,
+    "collection_id": Number,
+    "title": String,
+    "introduction": String,
+    "chain": String,
+    "contract": String,
+    "image_url_cdn": String,
+    "status": String,
+    "remark": String,
+    "channel": String,
+    "items_number": String,
+    "birthday_time": String,
+    "sort": String,
+    "create_time": String,
+    "update_time": String,
+    "multiLanguageList": [
+      {
+        "lang": String,
+        "id": String,
+        "data": {
+          "title": String,
+          "introduction": String
+        }
+      }
+    ]
+  }
+}
+```

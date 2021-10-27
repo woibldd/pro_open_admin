@@ -101,14 +101,14 @@ export const NFTApproval = [
   {
     path: 'NFT/list',
     name: 'Token',
-    component: () => import('@/views/approval/token/list'),
+    component: () => import('@/views/approval/nft/list'),
     meta: { title: 'NFT审核列表', icon: 'table' }
   },
   {
     path: 'NFT/detail/:id',
     name: 'tokenDetail',
     hidden: true,
-    component: () => import('@/views/approval/token/detail'),
+    component: () => import('@/views/approval/nft/detail'),
     meta: { title: 'NFT详情', icon: 'table' }
   }
 ]

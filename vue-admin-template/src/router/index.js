@@ -237,17 +237,32 @@ export const asyncRoutes = [
     name: 'userManagemen',
     component: Layout,
     redirect: '/userManagemen/list',
-    meta: { title: '用户管理', icon: 'tree' },
+    meta: { title: 'admin管理', icon: 'tree' },
     children: [
       {
         path: 'list',
         name: 'userManagemenList',
         component: () => import('@/views/userManagemen/list.vue'),
-        meta: { title: '用户管理', icon: 'form' }
+        meta: { title: '账户管理', icon: 'form' }
       }
     ]
   },
 
+  {
+    path: '/openUserManagemen',
+    name: 'openUserManagemen',
+    component: Layout,
+    redirect: '/openUserManagemen/list',
+    meta: { title: '用户管理', icon: 'tree' },
+    children: [
+      {
+        path: 'list',
+        name: 'openUserManagemenList',
+        component: () => import('@/views/userManagemen/list.vue'),
+        meta: { title: '用户列表', icon: 'form' }
+      }
+    ]
+  },
   {
     path: '/operation',
     component: Layout,

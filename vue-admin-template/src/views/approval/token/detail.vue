@@ -4,24 +4,20 @@
     <div class="header">
       <div class="icon-info">
         <el-avatar class="icon" shape="circle" :size="50" fit="fit" :src="dataInfo.icon" alt="alt"></el-avatar>
-        <h1 class="name">{{ dataInfo.name }}</h1>
-
-        <el-tag class="symbol" size="small" type="info" style="margin-right:5px">{{ dataInfo.coin }}</el-tag>
-        <el-tag class="chain" size="small" type="info" style="margin-right:5px">{{ dataInfo.chain }}</el-tag>
+        <h1 class="symbol">{{ dataInfo.coin }}</h1>
+        <div class="name">{{ dataInfo.name }}</div>
+        <el-tag class="chain" size="small" type="info" style="margin-right:5px">{{ dataInfo.chain | UpperCase }}链</el-tag>
         <el-tag size="small" type="info" v-if="dataInfo.contract || dataInfo.contract.length == 2">代币</el-tag>
-
         <el-select v-model="lang" placeholder="语言展示" class="lang" @change="langChange">
-          <el-option v-for="item in languageTypeOptions" :key="item.id" :label="item.lang" :value="item.id" />
+          <el-option v-for="item in languageTypeOptions" :key="item.lang" :label="item.lang" :value="item.lang" />
         </el-select>
       </div>
       <div>
         <el-tag :type="dataInfo.status | appovalFilterColor">{{ dataInfo.status | appovalFilter }}</el-tag>
       </div>
     </div>
-     <div style='margin-top:30px' v-if="dataInfo.status == 2 && dataInfo.remark">
-      <el-alert type="error" >
-          拒绝原因： {{  dataInfo.remark }}
-      </el-alert>
+    <div style="margin-top:30px" v-if="dataInfo.status == 2 && dataInfo.remark">
+      <el-alert type="error"> 拒绝原因： {{ dataInfo.remark }} </el-alert>
     </div>
     <el-form class="body" :inline="true" label-position="right">
       <div class="info">
@@ -68,8 +64,6 @@
         </el-row>
       </div>
     </el-form>
-
-   
 
     <div class="footer">
       <el-button v-if="dataInfo.status == 0" type="danger" @click="refuse" :loading="submitLoading">
@@ -139,10 +133,10 @@ export default {
   data() {
     return {
       languageTypeOptions,
-      lang:"en",
+      lang: 'en',
       dataInfo: {
-          multiLanguageList:[],
-          contract:''
+        multiLanguageList: [],
+        contract: ''
       },
       formData: {
         remark: ''
@@ -168,6 +162,9 @@ export default {
         tagtype: 'info'
       }
       return tagtype
+    },
+    UpperCase(val = '') {
+      return val.toUpperCase()
     }
   },
   created() {
@@ -183,7 +180,7 @@ export default {
           const data = res.data
           this.dataInfo = Object.assign(this.dataInfo, data)
 
-          this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length>0 ? data.multiLanguageList :[{ id: '', lang: 'en', data }]
+          this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length > 0 ? data.multiLanguageList : [{ id: '', lang: 'en', data }]
           this.IconColumus = this.IconColumus.map(v => {
             if (data[v.key]) {
               v.show = true
@@ -201,12 +198,11 @@ export default {
         })
         .catch(err => console.error(err))
     },
-    async langChange(val){
-        const langData = this.languageTypeOptions.find(v=>v.id ==val)
-        if(langData && langData.data){
-            Object.assign( this.dataInfo, langData.data)
-        }
-      
+    async langChange(val) {
+      const langData = this.languageTypeOptions.find(v => v.id == val)
+      if (langData && langData.data) {
+        Object.assign(this.dataInfo, langData.data)
+      }
     },
     async submitApproval(type) {
       if (type == 1) {
@@ -257,9 +253,12 @@ export default {
     .icon-info {
       display: flex;
       align-items: center;
+      justify-content: stretch;
+      .symbol {
+        margin-left: 5px;
+      }
       .name {
-        font-size: 40px;
-        margin: 0 5px 0px 15px;
+        margin: 0 10 0 5px;
       }
     }
     .lang {

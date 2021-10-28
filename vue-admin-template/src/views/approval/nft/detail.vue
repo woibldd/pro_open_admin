@@ -44,7 +44,7 @@
           </el-col>
         </el-row>
 
-        <el-divider class="title">token介绍</el-divider>
+        <el-divider class="title">NFT介绍</el-divider>
 
         <el-row :gutter="10" class="content">
           <el-col :xs="col.xs || 24" :sm="col.sm || 8" :span="col.span || 8" v-for="col in OtherColumus" :key="col.key">
@@ -99,26 +99,26 @@ import { parseTime, UpperCase } from '@/utils'
 
 const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
 
+
 const IconColumus = [
   { label: 'NFT名称:', key: 'title', type: 'string', show: false, value: '' },
-  { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
+  { label: '图标:', key: 'image_url_cdn', type: 'image', show: false, value: '' },
   { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: UpperCase },
   { label: '合约:', key: 'contract', type: 'string', show: false, value: '' },
-
-  // { label: '浏览器（账户）', key: 'coin', type: 'string', show: false, value: '' },
+  { label: '数量:', key: 'items_number', type: 'string', show: false, value: '' }
 ]
 
 const OtherColumus = [
-  { label: '精度:', key: 'decimals', type: 'string', show: false, value: '' },
-  { label: '币价:', key: 'price', type: 'string', show: false, value: '' },
-  { label: '币价来源:', key: 'price_from', type: 'string', show: false, value: '' },
-  { label: '货币介绍:', key: 'about', span: 24, type: 'string', show: false, value: '' }
+  { label: 'NFT渠道:', key: 'channel', type: 'string', show: false, value: '' },
+  { label: 'NFT介绍:', key: 'introduction', span: 24, type: 'string', show: false, value: '' },
+  { label: '对应线上collectionId:', key: 'collection_id', span: 24, type: 'string', show: false, value: '' }
 ]
 
 const Other1Columus = [
-  { label: '浏览器（TXID）:', key: 'browserTx', type: 'href', show: false, value: '' },
-  { label: '白皮书地址:', key: 'whitepaper', type: 'href', show: false, value: '' },
-  { label: '工具栏:', key: 'nft', type: 'string', show: false, value: '' }
+  { label: '生日：', key: 'birthday_time', type: 'href', show: false, value: '' },
+  { label: '排序：', key: 'sort', type: 'href', show: false, value: '' },
+  { label: '是否上线：', key: 'is_online', type: 'href', show: false, value: '' },
+  { label: '拒绝审核原因：', key: 'remark', type: 'href', show: false, value: '' }
 ]
 
 const calendarTypeOptions = [

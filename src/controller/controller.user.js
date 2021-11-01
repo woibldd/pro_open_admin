@@ -119,7 +119,7 @@ module.exports = class UserController extends CoreController {
       const filterKeys = [ "password", "permission"].filter((v) => params[v] && params[v] != "undefined");
       if(filterKeys.length==0) return true
       const nUser = await DBhelper.queryMysql(MYSQL, {
-        sql: `UPDATE User set ${filterKeys.map((v) =>`${v}=?`).join(",")} WHERE id=${sessionId} `,
+        sql: `UPDATE User set ${filterKeys.map((v) =>`${v}=?`).join(",")} WHERE id=${id} `,
         values: filterKeys.map((k) => params[k]),
       });
 

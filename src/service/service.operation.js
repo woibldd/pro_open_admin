@@ -11,7 +11,7 @@ module.exports = class OperationService {
         const loginName = users && users[0] && users[0].loginName || '';
         const operationContent = `用户[${loginName}]${operation}`;
         await DBhelper.queryMysql(MYSQL, {
-           sql: `INSERT INTO Operation (userId, operation, module) VALUES (?,?) `,
+           sql: `INSERT INTO Operation (userId, operation, module) VALUES (?,?,?) `,
            values: [ userId, operationContent, module ] 
         });
     }

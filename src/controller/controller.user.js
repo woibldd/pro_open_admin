@@ -103,7 +103,8 @@ module.exports = class UserController extends CoreController {
 
       await this.operationService.insertOperation(
         sessionId,
-        `添加新用户[${loginName}]`
+        `添加新用户[${loginName}]`,
+        'user'
       );
     } else {
       if (params.password) params.password = MD5(params.password);
@@ -124,7 +125,8 @@ module.exports = class UserController extends CoreController {
 
       await this.operationService.insertOperation(
         sessionId,
-        `更新用户${JSON.stringify(result)} to ${JSON.stringify(nUser)}`
+        `更新用户${JSON.stringify(result)} to ${JSON.stringify(nUser)}`,
+        'user'
       );
     }
 

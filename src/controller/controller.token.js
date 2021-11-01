@@ -81,7 +81,7 @@ module.exports = class TokenController extends CoreController {
         if (status === this.tokenStatus.FAILED) {
             failRemark = `, 拒绝原因为:${remark}`;
         }
-        this.operationService.insertOperation(sessionId, `审核Token[${id}]状态为${this.tokenStatus.getKey(status)}${failRemark}`);
+        this.operationService.insertOperation(sessionId, `审核Token[${id}]状态为${this.tokenStatus.getKey(status)}${failRemark}`, 'token');
 
         if (status !== this.tokenStatus.LISTED) {
             await DBhelper.queryMysql(MYSQL_OPEN, {
@@ -103,8 +103,6 @@ module.exports = class TokenController extends CoreController {
             url: `${CONFIG.host_coin}/admin/coinList`,
             json: true,
             body
-        }).catch((err) => {
-            return err;
         });
         
         let coin = null;
@@ -134,24 +132,25 @@ module.exports = class TokenController extends CoreController {
             url: `${CONFIG.host_coin}/admin/openSyncCoin`,
             json: true,
             body: data
-        }).catch((err) => {
-            return err;
         });
 
-        // coin新增后更新coin_id
-        if (updatedCoins && updatedCoins.length > 0 && !token.coin_id) {
-            const updatedCoin = updatedCoins[0];
-
-            await DBhelper.queryMysql(MYSQL_OPEN, {
-                sql: `UPDATE Token SET coin_id=?, status=?, remark=? WHERE id=?`,
-                values: [ updatedCoin.id, status, remark || '', id ]
-            })
-        } else {
-            // coin更新后
-            await DBhelper.queryMysql(MYSQL_OPEN, {
-                sql: `UPDATE Token SET status=?, remark=? WHERE id=? `,
-                values: [ status, remark || '', id ]
-            });
+        let updatedCoin = null;
+        if (updatedCoins && updatedCoins.length > 0) {
+            updatedCoin = updatedCoins[0];
+            
+            if (!token.coin_id) {
+                // coin新增后更新coin_id
+                await DBhelper.queryMysql(MYSQL_OPEN, {
+                    sql: `UPDATE Token SET coin_id=?, status=?, remark=?, is_online=? WHERE id=?`,
+                    values: [ updatedCoin.id, status, remark || '', updatedCoin.status || 1, id ]
+                });
+            } else {
+                // coin更新后
+                await DBhelper.queryMysql(MYSQL_OPEN, {
+                    sql: `UPDATE Token SET status=?, remark=?, is_online=? WHERE id=? `,
+                    values: [ status, remark || '', updatedCoin.status || 1, id ]
+                });
+            }
         }
 
         // 多语言同步

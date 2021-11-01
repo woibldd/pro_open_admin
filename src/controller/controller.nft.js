@@ -70,7 +70,7 @@ module.exports = class NFTController extends CoreController {
         if (status === this.tokenStatus.FAILED) {
             failRemark = `, 拒绝原因为:${remark}`;
         }
-        this.operationService.insertOperation(sessionId, `审核NFT[${id}]状态为${this.tokenStatus.getKey(status)}${failRemark}`);
+        this.operationService.insertOperation(sessionId, `审核NFT[${id}]状态为${this.tokenStatus.getKey(status)}${failRemark}`, 'nft');
 
         if (status !== this.tokenStatus.LISTED) {
             await DBhelper.queryMysql(MYSQL_OPEN, {
@@ -92,8 +92,6 @@ module.exports = class NFTController extends CoreController {
             url: `${CONFIG.host_nft}/admin/collectionList`,
             json: true,
             body
-        }).catch((err) => {
-            return err;
         });
         
         let collection = null;
@@ -122,24 +120,25 @@ module.exports = class NFTController extends CoreController {
             url: `${CONFIG.host_nft}/admin/openSyncCollection`,
             json: true,
             body: data
-        }).catch((err) => {
-            return err;
         });
 
-        // collection新增后更新collection_id
-        if (updatedNfts && updatedNfts.length > 0 && !nft.coin_id) {
-            const updatedNft = updatedNfts[0];
-
-            await DBhelper.queryMysql(MYSQL_OPEN, {
-                sql: `UPDATE NFT SET collection_id=?, status=?, remark=? WHERE id=?`,
-                values: [ updatedNft.id, status, remark || '', id ]
-            })
-        } else {
-            // collection更新后
-            await DBhelper.queryMysql(MYSQL_OPEN, {
-                sql: `UPDATE NFT SET status=?, remark=? WHERE id=? `,
-                values: [ status, remark || '', id ]
-            });
+        let updatedNft = null;
+        if (updatedNfts && updatedNfts.length > 0) {
+            updatedNft = updatedNfts[0];
+            
+            if (!nft.coin_id) {
+                // collection新增后更新collection_id
+                await DBhelper.queryMysql(MYSQL_OPEN, {
+                    sql: `UPDATE NFT SET collection_id=?, status=?, remark=?, is_online=? WHERE id=?`,
+                    values: [ updatedNft.id, status, remark || '', updatedNft.status, id ]
+                })
+            } else {
+                // collection更新后
+                await DBhelper.queryMysql(MYSQL_OPEN, {
+                    sql: `UPDATE NFT SET status=?, remark=?, is_online WHERE id=? `,
+                    values: [ status, remark || '', updatedNft.status, id ]
+                });
+            }
         }
 
         // 多语言同步

@@ -14,9 +14,11 @@ CREATE TABLE IF NOT EXISTS `User` (
 CREATE TABLE IF NOT EXISTS `Operation` (
 	`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `userId` varchar(100) NOT NULL DEFAULT '' COMMENT '用户Id',
+    `module` varchar(100) NOT NULL DEFAULT '' COMMENT '模块',
     `operation` text NOT NULL COMMENT '操作内容',
 	`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   	`update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   	PRIMARY KEY (`id`),
-	KEY `create_time` (`create_time`)
+	KEY `create_time` (`create_time`),
+	KEY `module` (`module`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

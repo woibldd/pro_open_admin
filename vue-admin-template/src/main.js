@@ -46,3 +46,5 @@ new Vue({
   store,
   render: h => h(App)
 })
+window.buildVersion = process.env.VUE_APP_BUILD_VERSION
+window.version = process.env.VUE_APP_VERSION

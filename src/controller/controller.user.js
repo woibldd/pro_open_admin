@@ -125,7 +125,7 @@ module.exports = class UserController extends CoreController {
 
       await this.operationService.insertOperation(
         sessionId,
-        `更新用户${JSON.stringify(result)} to ${JSON.stringify(nUser)}`,
+        `更新用户[${loginName}]`,
         'user'
       );
     }

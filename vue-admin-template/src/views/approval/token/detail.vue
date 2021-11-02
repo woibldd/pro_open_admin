@@ -19,27 +19,20 @@
     <div style="margin-top:30px" v-if="dataInfo.status == 2 && dataInfo.remark">
       <el-alert type="error"> 拒绝原因： {{ dataInfo.remark }} </el-alert>
     </div>
-    <el-form class="body" :inline="true" label-position="right">
+    <el-form class="body">
       <div class="info">
         <el-divider class="title">基本信息</el-divider>
         <!-- <h3 class="title">基本信息</h3> -->
         <el-row :gutter="10" class="content">
-          <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in IconColumus" :key="col.key">
-            <el-form-item :label="col.label || col.key" v-if="col.type == 'href'">
-              <el-link :href="col.value" target="_blank">{{ col.filter ? col.filter(col.value) : col.value }}</el-link>
+          <el-col :xs="col.xs || 24" :sm="col.sm || 6" v-for="col in IconColumus" :key="col.key">
+            <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
+              <el-link :href="dataInfo[col.key] || col.value" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key] || col.value) : dataInfo[col.key] || col.value }}</el-link>
             </el-form-item>
-            <el-form-item :label="col.label || col.key" v-else-if="col.type == 'image'">
-              <el-avatar shape="circle" :size="30" fit="fit" :src="col.value" alt="alt"></el-avatar>
-            </el-form-item>
-            <el-form-item :label="col.label || col.key" v-else-if="col.type == 'array'">
-              <el-col :xs="col.xs || 24" :sm="col.sm || 8">
-                <el-form-item :label="subCol.label || subCol.key" v-for="subCol in col.value || []" :key="subCol.key">
-                  {{ col.value }}
-                </el-form-item>
-              </el-col>
+            <el-form-item v-else-if="col.type == 'image'" :label="col.label || col.key">
+              <el-avatar shape="circle" :size="30" fit="fit" :src="dataInfo[col.key] || col.value" alt="alt"></el-avatar>
             </el-form-item>
             <el-form-item :label="col.label || col.key" v-else>
-              {{ col.filter ? col.filter(col.value) : col.value }}
+              {{ col.filter ? col.filter(dataInfo[col.key] || col.value) : dataInfo[col.key] }}
             </el-form-item>
           </el-col>
         </el-row>
@@ -47,18 +40,44 @@
         <el-divider class="title">token介绍</el-divider>
 
         <el-row :gutter="10" class="content">
-          <el-col :xs="col.xs || 24" :sm="col.sm || 8" :span="col.span || 8" v-for="col in OtherColumus" :key="col.key">
-            <el-form-item :label="col.label || col.key">
-              {{ col.value }}
+          <el-col :xs="col.xs || 24" :sm="col.sm || 6" :offset="col.offset || 0" v-for="col in OtherColumus" :key="col.key" :style="col.style || {}">
+            <el-form-item :label="col.label || col.key" :style="col.Contentstyle || {}">
+              {{ dataInfo[col.key] || col.value }}
             </el-form-item>
           </el-col>
         </el-row>
-        <el-divider class="title">其他信息</el-divider>
 
+        <el-divider class="title" v-if="Tools.length>0">tools工具</el-divider>
+
+        <el-row :gutter="10" class="content" v-for="row in Tools" :key="row.id">
+          <el-col :xs="24" :sm="8">
+            <el-form-item label="工具名称">
+              {{ row.toolname || '--' }}
+            </el-form-item>
+          </el-col>
+          <el-col :xs="24" :sm="8">
+            <el-form-item label="图标链接">
+              <el-avatar :title="row.icon" shape="circle" :size="30" fit="fit" :src="row.icon" alt="alt"></el-avatar>
+            </el-form-item>
+          </el-col>
+          <el-col :xs="24" :sm="8">
+            <el-form-item label="URL">
+              <el-link v-if="row.url" :href="row.url" target="_blank"> {{ row.url }}</el-link>
+              <span v-else>--</span>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+
+        <el-divider class="title">其他信息</el-divider>
         <el-row :gutter="10" class="content">
           <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in Other1Columus" :key="col.key">
-            <el-form-item :label="col.label || col.key">
-              {{ col.value }}
+            <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
+              <el-link v-if="dataInfo[col.key]" :href="col.value" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key]) : dataInfo[col.key] }}</el-link>
+              <span v-else>--</span>
+            </el-form-item>
+            <el-form-item v-else :label="col.label || col.key">
+              {{ dataInfo[col.key] || col.value || '--' }}
             </el-form-item>
           </el-col>
         </el-row>
@@ -100,26 +119,31 @@ import { parseTime, UpperCase } from '@/utils'
 const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
 
 const IconColumus = [
-  { label: '货币:', key: 'coin', type: 'string', show: false, value: '' },
+  { label: 'Token 名称:', key: 'name', type: 'string', show: false, value: '' },
+  { label: '币名(标识):', key: 'coin', type: 'string', show: false, value: '' },
   { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
   { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: UpperCase },
-  { label: '合约:', key: 'contract', type: 'string', show: false, value: '' },
-  { label: '全名:', key: 'name', type: 'string', show: false, value: '' }
+  { label: '合约:', key: 'contract', type: 'string', sm: 24, show: false, value: '' }
 
   // { label: '浏览器（账户）', key: 'coin', type: 'string', show: false, value: '' },
 ]
 
 const OtherColumus = [
-  { label: '精度:', key: 'decimals', type: 'string', show: false, value: '' },
-  { label: '币价:', key: 'price', type: 'string', show: false, value: '' },
-  { label: '币价来源:', key: 'price_from', type: 'string', show: false, value: '' },
-  { label: '货币介绍:', key: 'about', span: 24, type: 'string', show: false, value: '' }
+  { label: '总供应量:', key: 'supply_total', type: 'string', show: false, value: '--' },
+  { label: '精度:', key: 'decimals', type: 'string', show: false, value: '--' },
+  { label: '币价:', key: 'price', type: 'string', show: false, value: '--' },
+  { label: '币价来源:', key: 'price_from', type: 'string', show: false, value: '--' },
+
+  { label: '货币介绍:', key: 'about', sm: 20, type: 'string', show: false, value: '--' }
 ]
 
 const Other1Columus = [
-  { label: '浏览器（TXID）:', key: 'browserTx', type: 'href', show: false, value: '' },
-  { label: '白皮书地址:', key: 'whitepaper', type: 'href', show: false, value: '' },
-  { label: '工具栏:', key: 'coin', type: 'string', show: false, value: '' }
+  { label: '白皮书:', key: 'whitepaper', type: 'href', show: false, value: '' },
+  { label: 'Twitter:', key: 'twitter', type: 'href', show: false, value: '' },
+  { label: '官网:', key: 'website', type: 'href', show: false, value: '' },
+  { label: 'GitHub:', key: 'github', type: 'href', show: false, value: '' },
+  { label: 'Telegram:', key: 'telegram', type: 'href', show: false, value: '' },
+  { label: 'Facebook:', key: 'facebook', type: 'href', show: false, value: '' }
 ]
 
 const calendarTypeOptions = [
@@ -146,7 +170,8 @@ export default {
 
       IconColumus,
       OtherColumus,
-      Other1Columus
+      Other1Columus,
+      Tools: []
     }
   },
   computed: {},
@@ -181,28 +206,45 @@ export default {
           this.dataInfo = Object.assign(this.dataInfo, data)
 
           this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length > 0 ? data.multiLanguageList : [{ id: '', lang: 'en', data }]
-          this.IconColumus = this.IconColumus.map(v => {
-            if (data[v.key]) {
-              v.show = true
-              v.value = data[v.key]
-            }
-            return v
-          })
-          this.OtherColumus = this.OtherColumus.map(v => {
-            if (data[v.key]) {
-              v.show = true
-              v.value = data[v.key]
-            }
-            return v
-          })
+          const { lang } = this.languageTypeOptions[0]
+          this.langChange(lang)
+
+          // this.IconColumus = this.IconColumus.map(v => {
+          //   if (data[v.key]) {
+          //     v.show = true
+          //     v.value = data[v.key]
+          //   }
+          //   return v
+          // })
+          // this.OtherColumus = this.OtherColumus.map(v => {
+          //   if (data[v.key]) {
+          //     v.show = true
+          //     v.value = data[v.key]
+          //   }
+          //   return v
+          // })
+          //  this.Other1Columus = this.Other1Columus.map(v => {
+          //   if (data[v.key]) {
+          //     v.show = true
+          //     v.value = data[v.key]
+          //   }
+          //   return v
+          // })
+          // this.tools = this.tools.map(v => {
+          //   if (data[v.key]) {
+          //     v.show = true
+          //     v.value = data[v.key]
+          //   }
+          //   return v
+          // })
         })
         .catch(err => console.error(err))
     },
     async langChange(val) {
-      const langData = this.languageTypeOptions.find(v => v.id == val)
-      if (langData && langData.data) {
-        Object.assign(this.dataInfo, langData.data)
-      }
+      const langData = this.languageTypeOptions.find(v => v.lang == val)
+        Object.assign(this.dataInfo, { abort: '', name: '',  whitepaper:'', tools: []}, langData && langData.data || {})
+      
+        this.Tools = this.dataInfo.tools || []
     },
     async submitApproval(type) {
       if (type == 1) {
@@ -267,7 +309,7 @@ export default {
   }
   .body {
     .info {
-      margin: 30px 0px;
+      // margin: 30px 0px;
       .title {
         .el-divider__text {
           font-size: 18px;
@@ -275,6 +317,9 @@ export default {
       }
       .content {
         padding-left: 10px;
+        .el-form-item__content {
+          overflow: hidden;
+        }
       }
     }
   }

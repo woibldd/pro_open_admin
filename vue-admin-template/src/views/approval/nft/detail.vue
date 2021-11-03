@@ -184,28 +184,28 @@ export default {
           this.dataInfo = Object.assign(this.dataInfo, data)
 
           this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length > 0 ? data.multiLanguageList : [{ id: '', lang: 'en', data }]
-          this.IconColumus = this.IconColumus.map(v => {
-            if (data[v.key]) {
-              v.show = true
-              v.value = data[v.key]
-            }
-            return v
-          })
-          this.OtherColumus = this.OtherColumus.map(v => {
-            if (data[v.key]) {
-              v.show = true
-              v.value = data[v.key]
-            }
-            return v
-          })
+          const { lang } = this.languageTypeOptions[0]
+          this.langChange(lang)
+          // this.IconColumus = this.IconColumus.map(v => {
+          //   if (data[v.key]) {
+          //     v.show = true
+          //     v.value = data[v.key]
+          //   }
+          //   return v
+          // })
+          // this.OtherColumus = this.OtherColumus.map(v => {
+          //   if (data[v.key]) {
+          //     v.show = true
+          //     v.value = data[v.key]
+          //   }
+          //   return v
+          // })
         })
         .catch(err => console.error(err))
     },
     async langChange(val) {
-      const langData = this.languageTypeOptions.find(v => v.id == val)
-      if (langData && langData.data) {
-        Object.assign(this.dataInfo, langData.data)
-      }
+      const langData = this.languageTypeOptions.find(v => v.lang == val)
+      Object.assign(this.dataInfo, { title: '', introduction: ''}, (langData && langData.data) || {})
     },
     async submitApproval(type) {
       if (type == 1) {
@@ -235,7 +235,7 @@ export default {
     refuse() {
       this.$nextTick(() => {
         this.formData.remark = ''
-         setTimeout(()=> this.$refs['dataForm'].clearValidate())
+        setTimeout(()=> this.$refs['dataForm'].clearValidate())
       })
       this.dialogFormVisible = true
     }

@@ -26,29 +26,27 @@
     </div>
 
     <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @sort-change="sortChange" @row-click="handleRowClick">
-      <el-table-column  label="ID"  fixed='left' prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="ID" fixed="left" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
         <template slot-scope="{ row }">
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="icon图标"  fixed='left' align="center">
+      <el-table-column label="icon图标" fixed="left" align="center">
         <template slot-scope="{ row }">
           <el-image style="width: 40px; height: 40px; border-radius:50%" :src="row.icon" fit="contain"></el-image>
         </template>
       </el-table-column>
-      <el-table-column label="币名(symbol)"  fixed='left'  align="center">
+      <el-table-column label="币名(symbol)" fixed="left" align="center">
         <template slot-scope="{ row }">
           {{ row.coin }}
         </template>
       </el-table-column>
-      <el-table-column label="主链(chain)"  fixed='left' width="110px" align="center">
+      <el-table-column label="主链(chain)" fixed="left" width="110px" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.chain }}</span>
         </template>
       </el-table-column>
 
-     
-      
       <el-table-column label="合约地址(contract)" align="center" show-overflow-tooltip>
         <template slot-scope="{ row }">
           <span @click.stop="handleCopy(row.contract, $event)" class="pointer" title="copy">{{ row.contract || '--' }}</span>
@@ -74,13 +72,13 @@
           {{ row.remark }}
         </template>
       </el-table-column>
-       <el-table-column label="更新时间"  width="110px" align="center">
+      <el-table-column label="更新时间" width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.update_time  | parseTime}}</span>
+          <span>{{ row.update_time | parseTime }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" fixed="right" align="center"  min-width="100" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" min-width="100" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
           <el-button v-if="row.status == 0" type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
             审核通过
@@ -97,37 +95,45 @@
 
     <div style="height:100px"></div>
     <!-- <ContainerFooter> -->
-    <pagination v-show="total > 0"  class="footer-pagination" align="right"  :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
+    <pagination v-show="total > 0" class="footer-pagination" align="right" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
     <!-- </ContainerFooter> -->
-  
-  
 
     <el-dialog :title="appovalFormData.type != 'approval' ? '拒绝审核' : '审核通过'" :visible.sync="dialogFormVisible">
-      <el-form :model="appovalFormData" ref="dataForm" label-position="right" label-width="80px">
-        <el-form-item label="icon图片">
+      <el-form :model="appovalFormData" ref="dataForm" label-position="right" label-width="100px">
+        <el-form-item label="icon图片：">
           <el-image style="width: 40px; height: 40px;border-radius:50%" :src="appovalFormData.data.icon" fit="contain"></el-image>
         </el-form-item>
-        <el-form-item label="币名">
+
+        <el-form-item label="币名：">
           <span>{{ appovalFormData.data.coin }} </span>
         </el-form-item>
-        <el-form-item label="主链">
+        <el-form-item label="主链：">
           <span>{{ appovalFormData.data.chain }}</span>
         </el-form-item>
-        <el-form-item label="合约地址">
+        <el-form-item label="合约地址：">
           <span>{{ appovalFormData.data.contract }}</span>
         </el-form-item>
-        <!-- <el-form-item label="精度">
-          <span>{{ appovalFormData.data.contract }}</span>
-        </el-form-item> -->
+        <el-form-item label="价格来源：">
+          <el-select v-model="appovalFormData.data.price_from" placeholder="价格来源（auto）" class="filter-item">
+            <el-option v-for="item in price_from_list" :key="item.key" :value="item.key">
+              <span style="float: left">{{ item.key }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">${{ item.value }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="当前币价：">
+          <span>${{ icon_price }}</span>
+        </el-form-item>
+
         <!-- 多语言 -->
-        <el-form-item label="全名">
+        <el-form-item label="全名：">
           <span>{{ appovalFormData.data.name }}</span>
         </el-form-item>
-        <el-form-item label="货币介绍">
+        <el-form-item label="货币介绍：">
           <span>{{ appovalFormData.data.about }}</span>
         </el-form-item>
 
-        <el-form-item label="发行总量">
+        <el-form-item label="发行总量：">
           <span>{{ appovalFormData.data.supply_total }}</span>
         </el-form-item>
         <!-- <el-form-item label="总市值">
@@ -150,7 +156,7 @@
 </template>
 
 <script>
-import { getList, verify } from '@/api/token'
+import { getList, verify, getPrice, update } from '@/api/token'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -217,9 +223,14 @@ export default {
       dialogFormVisible: false,
       appovalFormData: {
         remark: '',
+        price: 0,
         type: 'approval',
-        data: {}
+        row:{},
+        data: {
+          price_from: 'auto'
+        }
       },
+      price_from_list: [],
 
       rules: {
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -234,6 +245,12 @@ export default {
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       },
       downloadLoading: false
+    }
+  },
+  computed: {
+    icon_price() {
+      const { value } = this.price_from_list.find(v => v.key == this.appovalFormData.data.price_from) || { value: 0 }
+      return value
     }
   },
   created() {
@@ -278,20 +295,41 @@ export default {
       }
       this.handleFilter()
     },
-    handleApproval(row, type) {
+    // symbol', 'currency', 'chain', 'contract'
+    async handleApproval(row, type) {
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
+        this.$refs['dataForm'].resetFields()
       })
+      this.appovalFormData.price = 0
       this.appovalFormData.type = type
-      this.appovalFormData.data = row
+      this.appovalFormData.row = row
+      this.appovalFormData.data = JSON.parse(JSON.stringify(row))
       this.appovalFormData.remark = ''
+      this.getPrice()
+    },
+    async getPrice(){
+     const { data, status } =  await getPrice({
+        currency: 'usdt',
+        symbol: this.appovalFormData.data.coin,
+        chain: this.appovalFormData.data.chain,
+        contract: this.appovalFormData.data.contract
+      }).catch(err=>({status:5000}))
+      if (status == 0){
+         this.price_from_list = Object.entries(data).map(([key, value]) => ({ key: key == 'all' ? 'auto' : key, value }))
+      }     
     },
     async submitApproval() {
-      this.$refs['dataForm'].validate(valid => {
+      this.$refs['dataForm'].validate(async valid => {
         if (!valid) return
-        const { data, type, remark } = this.appovalFormData
+        const { data, type, remark,row } = this.appovalFormData
         this.submitLoading = true
+        if ( type=='approval' &&  row.price_from != data.price_from) {
+          await update({ id: data.id, price_from: data.price_from }).catch(err => {
+              this.$message.error(err)
+          })
+      }
         verify({ id: data.id, status: type == 'approval' ? 1 : 2, remark })
           .then(res => {
             this.handleFilter()

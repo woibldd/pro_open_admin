@@ -178,8 +178,9 @@ module.exports = class TokenController extends CoreController {
         return await Coinhelper.getPrice(params);
     }
     async update (params) {
-        this._checkParams(params, [ "id", 'sessionId','name','coin','chain','contract','icon']);
+        this._checkParams(params, [ "id", 'sessionId']);
 
+        const { multiLanguageList,  id } = params;
         const tokens = await DBhelper.queryMysql(MYSQL_OPEN, {
             sql: `SELECT * FROM Token WHERE id = ?`,
             values: [parseInt(id)]
@@ -187,8 +188,8 @@ module.exports = class TokenController extends CoreController {
         const tokenData = tokens && tokens[0];
         if (!tokenData) throw new Error('Token not found');
         //过滤修改的字段
-        ['owner_eth_address',  'search_key', 'id',  'status',  'contract', 'chain' ].forEach(key=>delete tokenData[key])
-        const {multiLanguageList, id} = params;
+        ['owner_eth_address',  'search_key', 'id',  'status',  'contract', 'chain', 'create_time', 'update_time' ].forEach(key=>delete tokenData[key])
+       
 
         let languageENData = null
         if(multiLanguageList && Array.isArray(multiLanguageList)){
@@ -208,9 +209,12 @@ module.exports = class TokenController extends CoreController {
             if(params[key]!=undefined) tokenData[key] = params[key]
            
         })
+        const setSqlK=`UPDATE Token SET  ${Object.keys(tokenData).map(v=>`${v}=?`).join(",")} where id=${id}`
+        const setSqlV  =  Object.keys(tokenData).map(k => tokenData[k])
+     
         const insertR = await DBhelper.queryMysql(MYSQL_OPEN, {
-            sql: `UPDATE Token SET  set ${Object.keys(tokenData).map(v=>`${v}=?`).join(",")} where id=${id}`,
-            values: Object.keys(tokenData).map(k => tokenData[k])
+            sql: setSqlK,
+            values:setSqlV
         });
     
         if(languageENData){

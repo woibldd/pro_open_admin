@@ -41,13 +41,16 @@
 
         <el-row :gutter="10" class="content">
           <el-col :xs="col.xs || 24" :sm="col.sm || 6" :offset="col.offset || 0" v-for="col in OtherColumus" :key="col.key" :style="col.style || {}">
-            <el-form-item :label="col.label || col.key" :style="col.Contentstyle || {}">
+            <el-form-item v-if="col.key == 'price_from'" :label="col.label || col.key" :style="col.Contentstyle || {}">
+              {{ dataInfo[col.key] }} <span style="padding-left:5px; color: #8492a6; font-size: 20px">${{ icon_price }}</span>
+            </el-form-item>
+            <el-form-item v-else :label="col.label || col.key" :style="col.Contentstyle || {}">
               {{ dataInfo[col.key] || col.value }}
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-divider class="title" v-if="Tools.length>0">tools工具</el-divider>
+        <el-divider class="title" v-if="Tools.length > 0">tools工具</el-divider>
 
         <el-row :gutter="10" class="content" v-for="row in Tools" :key="row.id">
           <el-col :xs="24" :sm="8">
@@ -68,7 +71,6 @@
           </el-col>
         </el-row>
 
-
         <el-divider class="title">其他信息</el-divider>
         <el-row :gutter="10" class="content">
           <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in Other1Columus" :key="col.key">
@@ -81,6 +83,17 @@
             </el-form-item>
           </el-col>
         </el-row>
+
+        <el-divider class="title">可修改信息</el-divider>
+
+        <el-form-item label="币价来源：">
+          <el-select v-model="dataInfo.price_from" :disabled="dataInfo.status != 0" placeholder="价格来源（auto）" class="filter-item" @change="price_from_change">
+            <el-option v-for="item in price_from_list" :key="item.key" :value="item.key">
+              <span style="float: left">{{ item.key }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">${{ item.value }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
       </div>
     </el-form>
 
@@ -113,7 +126,7 @@
 
 <script>
 import ContainerHeader from '@/components/ContainerHeader'
-import { getDetails, verify } from '@/api/token'
+import { getDetails, verify, getPrice, update } from '@/api/token'
 import { parseTime, UpperCase } from '@/utils'
 
 const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
@@ -131,7 +144,7 @@ const IconColumus = [
 const OtherColumus = [
   { label: '总供应量:', key: 'supply_total', type: 'string', show: false, value: '--' },
   { label: '精度:', key: 'decimals', type: 'string', show: false, value: '--' },
-  { label: '币价:', key: 'price', type: 'string', show: false, value: '--' },
+  // { label: '币价:', key: 'price', type: 'string', show: false, value: '--' },
   { label: '币价来源:', key: 'price_from', type: 'string', show: false, value: '--' },
 
   { label: '货币介绍:', key: 'about', sm: 20, type: 'string', show: false, value: '--' }
@@ -157,10 +170,13 @@ export default {
   data() {
     return {
       languageTypeOptions,
+      price_from_list: [],
       lang: 'en',
+      oDataInfo: {},
       dataInfo: {
         multiLanguageList: [],
-        contract: ''
+        contract: '',
+        price_from: 'auto'
       },
       formData: {
         remark: ''
@@ -174,7 +190,12 @@ export default {
       Tools: []
     }
   },
-  computed: {},
+  computed: {
+    icon_price() {
+      const { value } = this.price_from_list.find(v => v.key == this.dataInfo.price_from) || { value: 0 }
+      return value
+    }
+  },
   filters: {
     appovalFilter(key) {
       const { display_name } = calendarTypeOptions.find(v => v.key == key) || {
@@ -203,11 +224,17 @@ export default {
         .then(res => {
           if (!res.data) return
           const data = res.data
+          this.oDataInfo = data
           this.dataInfo = Object.assign(this.dataInfo, data)
 
           this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length > 0 ? data.multiLanguageList : [{ id: '', lang: 'en', data }]
           const { lang } = this.languageTypeOptions[0]
           this.langChange(lang)
+          this.getPrice()
+          clearInterval(this.timer)
+          this.timer = setInterval(() => {
+            this.getPrice()
+          }, 5000)
 
           // this.IconColumus = this.IconColumus.map(v => {
           //   if (data[v.key]) {
@@ -242,9 +269,23 @@ export default {
     },
     async langChange(val) {
       const langData = this.languageTypeOptions.find(v => v.lang == val)
-        Object.assign(this.dataInfo, { abort: '', name: '',  whitepaper:'', tools: []}, langData && langData.data || {})
-      
-        this.Tools = this.dataInfo.tools || []
+      Object.assign(this.dataInfo, { abort: '', name: '', whitepaper: '', tools: [] }, (langData && langData.data) || {})
+
+      this.Tools = this.dataInfo.tools || []
+    },
+    async price_from_change(val) {
+      console.log({ val })
+    },
+    async getPrice() {
+      const { data, status } = await getPrice({
+        currency: 'usdt',
+        symbol: this.dataInfo.coin,
+        chain: this.dataInfo.chain,
+        contract: this.dataInfo.contract
+      }).catch(err => ({ status: 5000 }))
+      if (status == 0) {
+        this.price_from_list = Object.entries(data).map(([key, value]) => ({ key: key == 'all' ? 'auto' : key, value }))
+      }
     },
     async submitApproval(type) {
       if (type == 1) {
@@ -253,6 +294,12 @@ export default {
       } else {
         await this.$refs['dataForm'].validate()
       }
+      if (type == 1 && this.oDataInfo.price_from != this.dataInfo.price_from) {
+        await update({ id: this.dataInfo.id, price_from: this.dataInfo.price_from }).catch(err => {
+            this.$message.error(err)
+        })
+      }
+
       this.submitLoading = true
       verify({ id: this.dataInfo.id, status: type, remark: this.formData.remark })
         .then(res => {
@@ -278,6 +325,9 @@ export default {
       })
       this.dialogFormVisible = true
     }
+  },
+  beforeDestroy() {
+    clearInterval(this.timer)
   }
 }
 </script>

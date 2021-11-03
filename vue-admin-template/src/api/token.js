@@ -1,5 +1,15 @@
 import request from '@/utils/request'
 
+
+export function getPrice(
+  params 
+) {
+  return request({
+    url: '/token/getPrice',
+    method: 'get',
+    params
+  })
+}
 export function getList(
   params = {
     pageNum: 1,
@@ -22,6 +32,13 @@ export function  getDetails(params = {
   })
 }
 
+export function update(data = {}) {
+  return request({
+    url: '/token/update',
+    method: 'post',
+    data
+  })
+}
 export function verify(data = {}) {
   return request({
     url: '/token/verify',

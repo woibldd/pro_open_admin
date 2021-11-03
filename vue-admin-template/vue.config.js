@@ -46,7 +46,7 @@ module.exports = {
       "/open_admin": {
         // target: "http://127.0.0.1:8888",
         target: "http://dev.bitkeep.top:8855",
-        //  target: "http://118.193.40.6:8866",
+        //  target: "http://118.193.40.6:8855",
         
       }
     }

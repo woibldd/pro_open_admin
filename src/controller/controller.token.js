@@ -173,8 +173,56 @@ module.exports = class TokenController extends CoreController {
         
         return true;
     }
-
+    // symbol', 'currency', 'chain', 'contract'
     async getPrice(params){
         return await Coinhelper.getPrice(params);
     }
+    async update (params) {
+        this._checkParams(params, [ "id", 'sessionId','name','coin','chain','contract','icon']);
+
+        const tokens = await DBhelper.queryMysql(MYSQL_OPEN, {
+            sql: `SELECT * FROM Token WHERE id = ?`,
+            values: [parseInt(id)]
+        });
+        const tokenData = tokens && tokens[0];
+        if (!tokenData) throw new Error('Token not found');
+        //过滤修改的字段
+        ['owner_eth_address',  'search_key', 'id',  'status',  'contract', 'chain' ].forEach(key=>delete tokenData[key])
+        const {multiLanguageList, id} = params;
+
+        let languageENData = null
+        if(multiLanguageList && Array.isArray(multiLanguageList)){
+            languageENData = multiLanguageList.find(({lang})=>lang === 'en')
+            if(!languageENData)  throw new Error('Lost multiLanguage param lang');
+                Object.assign(tokenData, {
+                    name : languageENData.name ||'',
+                    browser_account : languageENData.browser_account || '',
+                    browser_tx : languageENData.browser_tx || '',
+                    browser_quote : languageENData.browser_quote || '',
+                    about : languageENData.about || '',
+                    whitepaper : languageENData.whitepaper || '',
+                    tools : JSON.stringify(languageData.tools || [])
+                })
+        }
+        Object.keys(tokenData).forEach(key=>{
+            if(params[key]!=undefined) tokenData[key] = params[key]
+           
+        })
+        const insertR = await DBhelper.queryMysql(MYSQL_OPEN, {
+            sql: `UPDATE Token SET  set ${Object.keys(tokenData).map(v=>`${v}=?`).join(",")} where id=${id}`,
+            values: Object.keys(tokenData).map(k => tokenData[k])
+        });
+    
+        if(languageENData){
+            await LanguageHelper.batchSet('Token', multiLanguageList.map(_ => {
+                _.id = id;
+                return _;
+            })).catch(err => {
+                return err;
+            });
+        }
+        return insertR;
+    }
+
+    
 }

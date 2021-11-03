@@ -98,7 +98,7 @@ module.exports = class NFTController extends CoreController {
         // nft collection是否已经上线
         if (collections && collections.list && collections.list.length > 0) {
             collection = collections.list[0];
-            if (collection.owner_eth_address !== nft.owner_eth_address) throw new Error('线上已存在该NFT, 请重新确认');
+            if (collection.owner_eth_address !== nft.owner_eth_address || id !== collection.open_id) throw new Error('线上已存在该NFT, 请重新确认');
         }
 
         // 同步上线

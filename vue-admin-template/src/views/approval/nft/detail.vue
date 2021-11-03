@@ -3,7 +3,8 @@
     <!-- <ContainerHeader :title="$route.meta.title" /> -->
     <div class="header">
       <div class="icon-info">
-        <el-avatar class="icon" shape="circle" :size="50" fit="fit" :src="dataInfo.image_url_cdn" alt="alt"></el-avatar>
+
+        <el-avatar class="icon" shape="circle"  :size="50" fit="fit" :src="dataInfo.image_url_cdn" alt="alt"></el-avatar>
         <h1 class="symbol">{{ dataInfo.coin }}</h1>
         <div class="name">{{ dataInfo.name }}</div>
         <el-tag class="chain" size="small" type="info" style="margin-right:5px">{{ dataInfo.chain | UpperCase }}链</el-tag>
@@ -253,12 +254,17 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     .icon-info {
       display: flex;
       align-items: center;
-      justify-content: stretch;
+      // justify-content: stretch;
+      flex-wrap: wrap;
       .symbol {
         margin-left: 5px;
+      }
+      .icon{
+        min-width: 50px;
       }
       .name {
         margin: 0 10 0 5px;

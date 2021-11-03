@@ -80,7 +80,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" fixed="right" align="center"  min-width="100" class-name="small-padding fixed-width">
+      <el-table-column label="操作" fixed="right" align="center" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
           <el-button v-if="row.status == 0" type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
             审核通过

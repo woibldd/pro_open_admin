@@ -3,9 +3,11 @@
     {
       "name": "ProOpenAdmin",
       "script": "./index.js",
-      "node_args": "--inspect=0.0.0.0:8889",
+      "node_args": "--inspect=0.0.0.0:8867",
       "watch": true,
-      "log_date_format": "YYYY-MM-DD HH:mm:ss"
+      "log_date_format": "YYYY-MM-DD HH:mm:ss",
+      "error_file": "/data/caoshiyuan/logs/pro_open_admin/api_error.log",
+      "out_file":  "/data/caoshiyuan/logs/pro_open_admin/api_runtime.log"
     }
   ]
 }

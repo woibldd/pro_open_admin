@@ -110,7 +110,7 @@ module.exports = class TokenController extends CoreController {
         // token是否已经上线
         if (coins && coins.list && coins.list.length > 0) {
             coin = coins.list[0];
-            if (coin.owner_eth_address !== token.owner_eth_address) throw new Error('线上已存在该Token, 请重新确认');
+            if (coin.owner_eth_address !== token.owner_eth_address || id !== coin.open_id) throw new Error('线上已存在该Token, 请重新确认');
         }
 
         // 同步上线

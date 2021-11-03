@@ -2,6 +2,7 @@ const CoreController = require('./controller.core');
 const DBhelper = require('../tool/dbhelper');
 const NetHelper = require('../tool/nethelper');
 const LanguageHelper = require('../tool/langhelper');
+const Coinhelper = require('../tool/coinhelper');
 const TokenStatus = require('../enum/tokenStatus');
 const OperationService = require('../service/service.operation');
 
@@ -122,6 +123,7 @@ module.exports = class TokenController extends CoreController {
             browserQuote: token.browser_quote || '',
             version: token.version || 0,
             sort: token.sort || 0,
+            open_id: id,
             status: 1,                                       // ms_coin状态，上线
         });
         delete data.id;
@@ -170,5 +172,9 @@ module.exports = class TokenController extends CoreController {
         }));
         
         return true;
+    }
+
+    async getPrice(params){
+        return await Coinhelper.getPrice(params);
     }
 }

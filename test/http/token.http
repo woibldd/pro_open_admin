@@ -1,7 +1,7 @@
 # @host = http://localhost:8888/open_admin
 @host=http://106.75.67.107:8888/open_admin
 @content-json-type = application/json
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNDc4NDk4MiwiZXhwIjoxNjM0ODIwOTgyfQ.jWfGhjMOEvsJDIjrc7_bPZrgCkyUziu9ASPRFF5QrYk
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNTg0Njk2OSwiZXhwIjoxNjM1ODgyOTY5fQ.2FbmP7mvuCpEy6y_Rz-Iw9ZEy6i3NqVMKRD2vmNJczE
 
 ### 获取Token列表
 GET {{host}}/token/list HTTP/1.1
@@ -33,3 +33,8 @@ token: {{token}}
     "status": 1,
     "remark": "token名称错误"
 }
+
+### 获取币价
+GET {{host}}/token/getPrice?symbol=&currency=usdt&chain=&contract= HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}

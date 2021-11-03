@@ -105,6 +105,7 @@ module.exports = class NFTController extends CoreController {
         const data = Object.assign(nft, {
             sort: nft.sort || 0,
             status: 1,                                       // ms_nft状态，上线
+            open_id: id,
             birthday_time: moment(nft.birthday_time).format('YYYY:MM:DD HH:mm:ss') || moment().format('YYYY:MM:DD HH:mm:ss')
         });
         delete data.id;

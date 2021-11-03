@@ -105,7 +105,7 @@
     <el-dialog :title="appovalFormData.type != 'approval' ? '拒绝审核' : '审核通过'" :visible.sync="dialogFormVisible">
       <el-form :model="appovalFormData" ref="dataForm" label-position="right" label-width="80px">
         <el-form-item label="icon图片">
-          <el-image style="width: 40px; height: 40px;border-radius:50%" :src="appovalFormData.data.icon" fit="contain"></el-image>
+          <el-image style="width: 40px; height: 40px;border-radius:50%" :src="appovalFormData.data.image_url_cdn" fit="contain"></el-image>
         </el-form-item>
         <el-form-item label="NFT名称">
           <span>{{ appovalFormData.data.title }} </span>

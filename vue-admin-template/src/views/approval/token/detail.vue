@@ -14,6 +14,7 @@
       </div>
       <div>
         <el-tag :type="dataInfo.status | appovalFilterColor">{{ dataInfo.status | appovalFilter }}</el-tag>
+        <el-tag :type="(dataInfo.is_online==1? 1: 2) | appovalFilterColor" style="margin-left:5px">{{ dataInfo.is_online ==1 ? '已上线': '未上线' }}</el-tag>
       </div>
     </div>
     <div style="margin-top:30px" v-if="dataInfo.status == 2 && dataInfo.remark">
@@ -128,7 +129,7 @@
 import ContainerHeader from '@/components/ContainerHeader'
 import { getDetails, verify, getPrice, update } from '@/api/token'
 import { parseTime, UpperCase } from '@/utils'
-
+import { BigNumber } from "bignumber.js";
 const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
 
 const IconColumus = [
@@ -193,7 +194,7 @@ export default {
   computed: {
     icon_price() {
       const { value } = this.price_from_list.find(v => v.key == this.dataInfo.price_from) || { value: 0 }
-      return value
+      return BigNumber(value||0).toFixed()
     }
   },
   filters: {
@@ -321,7 +322,7 @@ export default {
     refuse() {
       this.$nextTick(() => {
         this.formData.remark = ''
-        this.$refs['dataForm'].clearValidate()
+        setTimeout(()=> this.$refs['dataForm'].clearValidate())
       })
       this.dialogFormVisible = true
     }

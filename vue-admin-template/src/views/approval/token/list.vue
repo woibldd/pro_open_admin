@@ -122,7 +122,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="当前币价：">
-          <span>${{ icon_price }}</span>
+          <span style="padding-left:5px; color: #8492a6; font-size: 20px">${{ icon_price }}</span>
         </el-form-item>
 
         <!-- 多语言 -->
@@ -163,6 +163,7 @@ import Pagination from '@/components/Pagination' // secondary package based on e
 import ContainerHeader from '@/components/ContainerHeader'
 import ContainerFooter from '@/components/ContainerFooter'
 import clip from '@/utils/clipboard'
+import { BigNumber } from "bignumber.js";
 const calendarTypeOptions = [
   { key: 0, display_name: '审核中', tagtype: 'warn' },
   { key: 1, display_name: '审核通过', tagtype: 'success' },
@@ -250,7 +251,7 @@ export default {
   computed: {
     icon_price() {
       const { value } = this.price_from_list.find(v => v.key == this.appovalFormData.data.price_from) || { value: 0 }
-      return value
+      return BigNumber(value).toFixed()
     }
   },
   created() {

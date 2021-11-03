@@ -14,6 +14,8 @@
       </div>
       <div>
         <el-tag :type="dataInfo.status | appovalFilterColor">{{ dataInfo.status | appovalFilter }}</el-tag>
+        <el-tag :type="(dataInfo.is_online==1? 1: 2) | appovalFilterColor" style="margin-left:5px">{{ dataInfo.is_online ==1 ? '已上线': '未上线' }}</el-tag>
+    
       </div>
     </div>
     <div style="margin-top:30px" v-if="dataInfo.status == 2 && dataInfo.remark">
@@ -23,23 +25,17 @@
       <div class="info">
         <el-divider class="title">基本信息</el-divider>
         <!-- <h3 class="title">基本信息</h3> -->
+        <!-- <h3 class="title">基本信息</h3> -->
         <el-row :gutter="10" class="content">
-          <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in IconColumus" :key="col.key">
-            <el-form-item :label="col.label || col.key" v-if="col.type == 'href'">
-              <el-link :href="col.value" target="_blank">{{ col.filter ? col.filter(col.value) : col.value }}</el-link>
+          <el-col :xs="col.xs || 24" :sm="col.sm || 6" v-for="col in IconColumus" :key="col.key">
+            <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
+              <el-link :href="dataInfo[col.key] || col.value" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key] || col.value) : dataInfo[col.key] || col.value }}</el-link>
             </el-form-item>
-            <el-form-item :label="col.label || col.key" v-else-if="col.type == 'image'">
-              <el-avatar shape="circle" :size="30" fit="fit" :src="col.value" alt="alt"></el-avatar>
-            </el-form-item>
-            <el-form-item :label="col.label || col.key" v-else-if="col.type == 'array'">
-              <el-col :xs="col.xs || 24" :sm="col.sm || 8">
-                <el-form-item :label="subCol.label || subCol.key" v-for="subCol in col.value || []" :key="subCol.key">
-                  {{ col.value }}
-                </el-form-item>
-              </el-col>
+            <el-form-item v-else-if="col.type == 'image'" :label="col.label || col.key">
+              <el-avatar shape="circle" :size="30" fit="fit" :src="dataInfo[col.key] || col.value" alt="alt"></el-avatar>
             </el-form-item>
             <el-form-item :label="col.label || col.key" v-else>
-              {{ col.filter ? col.filter(col.value) : col.value }}
+              {{ col.filter ? col.filter(dataInfo[col.key] || col.value) : dataInfo[col.key] }}
             </el-form-item>
           </el-col>
         </el-row>
@@ -47,18 +43,28 @@
         <el-divider class="title">NFT介绍</el-divider>
 
         <el-row :gutter="10" class="content">
-          <el-col :xs="col.xs || 24" :sm="col.sm || 8" :span="col.span || 8" v-for="col in OtherColumus" :key="col.key">
-            <el-form-item :label="col.label || col.key">
-              {{ col.value }}
+          <el-col :xs="col.xs || 24" :sm="col.sm || 6" :offset="col.offset || 0" v-for="col in OtherColumus" :key="col.key" :style="col.style || {}">
+            <el-form-item v-if="col.key == 'price_from'" :label="col.label || col.key" :style="col.Contentstyle || {}">
+              {{ dataInfo[col.key] }} <span style="padding-left:5px; color: #8492a6; font-size: 20px">${{ icon_price }}</span>
+            </el-form-item>
+            <el-form-item v-else :label="col.label || col.key" :style="col.Contentstyle || {}">
+              {{ dataInfo[col.key] || col.value }}
             </el-form-item>
           </el-col>
         </el-row>
+
         <el-divider class="title">其他信息</el-divider>
 
         <el-row :gutter="10" class="content">
-          <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in Other1Columus" :key="col.key">
-            <el-form-item :label="col.label || col.key">
-              {{ col.value }}
+          <el-col :xs="col.xs || 24" :sm="col.sm || 6" v-for="col in Other1Columus" :key="col.key">
+            <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
+              <el-link :href="dataInfo[col.key] || col.value" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key] || col.value) : dataInfo[col.key] || col.value }}</el-link>
+            </el-form-item>
+            <el-form-item v-else-if="col.type == 'image'" :label="col.label || col.key">
+              <el-avatar shape="circle" :size="30" fit="fit" :src="dataInfo[col.key] || col.value" alt="alt"></el-avatar>
+            </el-form-item>
+            <el-form-item :label="col.label || col.key" v-else>
+              {{ col.filter ? col.filter(dataInfo[col.key] || col.value) : dataInfo[col.key] }}
             </el-form-item>
           </el-col>
         </el-row>
@@ -99,26 +105,24 @@ import { parseTime, UpperCase } from '@/utils'
 
 const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
 
-
 const IconColumus = [
   { label: 'NFT名称:', key: 'title', type: 'string', show: false, value: '' },
   { label: '图标:', key: 'image_url_cdn', type: 'image', show: false, value: '' },
   { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: UpperCase },
-  { label: '合约:', key: 'contract', type: 'string', show: false, value: '' },
-  { label: '数量:', key: 'items_number', type: 'string', show: false, value: '' }
+  { label: '合约:', key: 'contract', type: 'string', show: false, value: '', sm: 24 }
 ]
 
 const OtherColumus = [
-  { label: 'NFT渠道:', key: 'channel', type: 'string', show: false, value: '' },
-  { label: 'NFT介绍:', key: 'introduction', span: 24, type: 'string', show: false, value: '' },
-  { label: '对应线上collectionId:', key: 'collection_id', span: 24, type: 'string', show: false, value: '' }
+  { label: 'NFT渠道:', key: 'channel', type: 'string', show: false, value: '--' },
+  { label: '数量:', key: 'items_number', type: 'string', show: false, value: '' },
+  { label: 'introduction:', key: 'introduction', sm: 20, type: 'string', show: false, value: '--' },
+  { label: '对应线上collectionId:', key: 'collection_id', type: 'string', show: false, value: '--' }
 ]
 
 const Other1Columus = [
   { label: '生日：', key: 'birthday_time', type: 'href', show: false, value: '' },
   { label: '排序：', key: 'sort', type: 'href', show: false, value: '' },
-  { label: '是否上线：', key: 'is_online', type: 'href', show: false, value: '' },
-  { label: '拒绝审核原因：', key: 'remark', type: 'href', show: false, value: '' }
+  { label: '是否上线：', key: 'is_online', type: 'href', show: false, value: '' }
 ]
 
 const calendarTypeOptions = [
@@ -231,7 +235,7 @@ export default {
     refuse() {
       this.$nextTick(() => {
         this.formData.remark = ''
-        this.$refs['dataForm'].clearValidate()
+         setTimeout(()=> this.$refs['dataForm'].clearValidate())
       })
       this.dialogFormVisible = true
     }

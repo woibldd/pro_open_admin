@@ -103,6 +103,7 @@ registerController('./controller/controller.user');
 registerController('./controller/controller.token');
 registerController('./controller/controller.nft');
 registerController('./controller/controller.operation');
+registerController('./controller/controller.openplatform');
 
 router.use(function(req, res){
   res.status(404).send('404');

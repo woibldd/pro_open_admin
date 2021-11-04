@@ -1,0 +1,11 @@
+{
+    "apps": [
+        {
+            "name": "ProOpenAdmin",
+            "script": "./index.js",
+            "node_args": "--inspect=0.0.0.0:8889",
+            "watch": true,
+            "log_date_format": "YYYY-MM-DD HH:mm:ss"
+        }
+    ]
+}

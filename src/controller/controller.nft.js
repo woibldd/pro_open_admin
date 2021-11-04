@@ -17,12 +17,15 @@ module.exports = class NFTController extends CoreController {
 
     async list (params) {
         this._checkParams(params, ['pageNum', 'pageSize']);
-        const { pageNum, pageSize, status } = params;
+        const { pageNum, pageSize, status, search_key} = params;
 
         const offset = (pageNum - 1) * pageSize;
         let where = `WHERE 1=1 `;
         if (status) {
             where += ` AND status=${status} `;
+        }
+        if(search_key){
+            where += ` AND search_key like  '%${search_key}%' OR title like '%${search_key}%'`;
         }
 
         const totalCount = await DBhelper.queryMysql(MYSQL_OPEN, `SELECT count(*) as count FROM NFT ${where}`);

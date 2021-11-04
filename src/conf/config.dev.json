@@ -1,6 +1,6 @@
 {
 	"debug": true,
-    "port": 8855,
+     "port": 8855,
 	"redis": {
         "host": "10.7.161.254",
         "port": 6379,

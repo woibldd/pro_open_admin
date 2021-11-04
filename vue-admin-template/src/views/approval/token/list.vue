@@ -4,10 +4,10 @@
     <div class="filter-container">
       <el-form :inline="true">
         <el-form-item label="关键字搜索">
-          <el-input v-model="listQuery.title" placeholder="token 合约 主链" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+          <el-input v-model="listQuery.search_key"  clearable placeholder="token 合约 主链" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
         </el-form-item>
         <el-form-item label="审核状态">
-          <el-select v-model="listQuery.type" placeholder="审核状态" clearable class="filter-item" style="width: 130px">
+          <el-select v-model="listQuery.status" placeholder="审核状态"  clearable class="filter-item" style="width: 130px">
             <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name + '(' + item.key + ')'" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -210,8 +210,8 @@ export default {
         pageNum: 1,
         pageSize: 20,
         importance: undefined,
-        title: undefined,
-        type: undefined,
+        search_key: undefined,
+        status: undefined,
         sort: '+id'
       },
       calendarTypeOptions,

@@ -16,13 +16,20 @@ module.exports = class TokenController extends CoreController {
 
     async list (params) {
         this._checkParams(params, ['pageNum', 'pageSize']);
-        const { pageNum, pageSize, status } = params;
+        const { pageNum, pageSize, status, search_key } = params;
 
         const offset = (pageNum - 1) * pageSize;
-        let where = `WHERE 1=1 `;
+        let where = `WHERE 1=1`;
+        if(search_key){
+            where += ` AND search_key like  '%${search_key}%' OR name like '%${search_key}%'`;
+        }
         if (status) {
             where += ` AND status=${status} `;
         }
+       
+
+     
+       
 
         const totalCount = await DBhelper.queryMysql(MYSQL_OPEN, `SELECT count(*) as count FROM Token ${where}`);
         const result = await DBhelper.queryMysql(MYSQL_OPEN, {

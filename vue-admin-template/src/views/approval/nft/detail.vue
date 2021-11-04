@@ -121,9 +121,9 @@ const OtherColumus = [
 ]
 
 const Other1Columus = [
-  { label: '生日：', key: 'birthday_time', type: 'href', show: false, value: '' },
-  { label: '排序：', key: 'sort', type: 'href', show: false, value: '' },
-  { label: '是否上线：', key: 'is_online', type: 'href', show: false, value: '' }
+  { label: '生日：', key: 'birthday_time', type: 'href', show: false, value: '--', filter: parseTime},
+  { label: '排序：', key: 'sort', type: 'href', show: false, value: '--' },
+  // { label: '是否上线：', key: 'is_online', type: 'href', show: false, value: '' }
 ]
 
 const calendarTypeOptions = [

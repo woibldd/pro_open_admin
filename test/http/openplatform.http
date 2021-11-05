@@ -1,0 +1,14 @@
+# @host = http://localhost:8888/open_admin
+@host=http://106.75.67.107:8888/open_admin
+@content-json-type = application/json
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYzNjAyNDcwNywiZXhwIjoxNjM2MDYwNzA3fQ._rR_pGG6qcQsvxuFk3hpwG6ZgSe4CElwsa8v6Uoi-_s
+
+### 获取用户列表
+GET {{host}}/openPlatform/list HTTP/1.1
+content-type: {{content-json-type}}
+token: {{token}}
+
+{
+    "pageNum": 1,
+    "pageSize": 10
+}

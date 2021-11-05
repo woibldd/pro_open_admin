@@ -16,7 +16,7 @@ module.exports = class openPlatformController extends CoreController {
 
         const totalCount = await DBhelper.queryMysql(MYSQL_OPEN, `SELECT count(*) as count FROM OpenPlatform`);
         const result = await DBhelper.queryMysql(MYSQL_OPEN, {
-            sql: `SELECT * FROM OpenPlatform ORDER BY create_time DESC LIMIT ?,?`,
+            sql: `SELECT * FROM OpenPlatform ORDER BY create_time ASC LIMIT ?,?`,
             values: [parseInt(offset), parseInt(pageSize)]
         });
 

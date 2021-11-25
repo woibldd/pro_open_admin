@@ -64,5 +64,5 @@
 		"npm": ">= 3.0.0"
 	},
 	"license": "MIT",
-	"buildVersion": "0.0.27"
+	"buildVersion": "0.0.31"
 }

@@ -100,18 +100,35 @@ export const TokenApproval = [
 export const NFTApproval = [
   {
     path: 'NFT/list',
-    name: 'Token',
+    name: 'NFT',
     component: () => import('@/views/approval/nft/list'),
     meta: { title: 'NFT审核列表', icon: 'table' }
   },
   {
     path: 'NFT/detail/:id',
-    name: 'tokenDetail',
+    name: 'NFTDetail',
     hidden: true,
     component: () => import('@/views/approval/nft/detail'),
     meta: { title: 'NFT详情', icon: 'table' }
   }
 ]
+
+export const DAppApproval = [
+  {
+    path: 'DAPP/list',
+    name: 'DAPP',
+    component: () => import('@/views/approval/dapp/list'),
+    meta: { title: 'DAPP审核列表', icon: 'table' }
+  },
+  {
+    path: 'DAPP/detail/:id',
+    name: 'DAPPDetail',
+    hidden: true,
+    component: () => import('@/views/approval/dapp/detail'),
+    meta: { title: 'DAPP详情', icon: 'table' }
+  }
+]
+
 
 export const constantRoutes = [
   {
@@ -230,7 +247,7 @@ export const asyncRoutes = [
     redirect: '/approval/token/list',
     name: 'Approval',
     meta: { title: '审核列表', icon: 'el-icon-s-help' },
-    children: [...TokenApproval, ...NFTApproval]
+    children: [...TokenApproval, ...NFTApproval,...DAppApproval]
   },
   {
     path: '/userManagemen',

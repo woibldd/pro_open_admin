@@ -63,6 +63,7 @@ module.exports = class Helper {
         })
     }
 
+  
     // 标签相关
     static async tagList(data) {
         return await NetHelper.get({
@@ -71,6 +72,7 @@ module.exports = class Helper {
             'body': data
         })
     }
+    
 
     static async updateTag(data) {
         return await NetHelper.post({
@@ -126,6 +128,16 @@ module.exports = class Helper {
             'url': `${CONFIG.host_market}/admin/updateHotSearch`,
             'json': true,
             'body': data
+        })
+    }
+
+
+    // dapp
+    async getTageList(data){
+        return await NetHelper.get({
+            'url': `${CONFIG.host_dapp}/admin/getTageList`,
+            'json': true,
+            "body": data
         })
     }
 }

@@ -48,7 +48,7 @@ module.exports = class TokenController extends CoreController {
         const { id } = params;
 
         const tokens = await DBhelper.queryMysql(MYSQL_OPEN, {
-            sql: `SELECT * FROM Token WHERE id = ?`,
+            sql: `SELECT * FROM DApp WHERE id = ?`,
             values: [parseInt(id)]
         });
         const token = tokens && tokens[0];
@@ -78,7 +78,7 @@ module.exports = class TokenController extends CoreController {
         const { id, status, remark, sessionId } = params;
 
         const result = await DBhelper.queryMysql(MYSQL_OPEN, {
-            sql: `SELECT * FROM Token WHERE id = ?`,
+            sql: `SELECT * FROM DApp WHERE id = ?`,
             values: [parseInt(id)]
         });
         if (!result || result.length === 0) throw new Error('Token not found');
@@ -93,7 +93,7 @@ module.exports = class TokenController extends CoreController {
 
         if (status !== this.tokenStatus.LISTED) {
             await DBhelper.queryMysql(MYSQL_OPEN, {
-                sql: `UPDATE Token SET status=?, remark=? WHERE id=? `,
+                sql: `UPDATE DApp SET status=?, remark=? WHERE id=? `,
                 values: [ status, remark || '', id ]
             });
             return true;
@@ -189,7 +189,7 @@ module.exports = class TokenController extends CoreController {
 
         const { multiLanguageList,  id } = params;
         const tokens = await DBhelper.queryMysql(MYSQL_OPEN, {
-            sql: `SELECT * FROM Token WHERE id = ?`,
+            sql: `SELECT * FROM DApp WHERE id = ?`,
             values: [parseInt(id)]
         });
         const tokenData = tokens && tokens[0];
@@ -216,7 +216,7 @@ module.exports = class TokenController extends CoreController {
             if(params[key]!=undefined) tokenData[key] = params[key]
            
         })
-        const setSqlK=`UPDATE Token SET  ${Object.keys(tokenData).map(v=>`${v}=?`).join(",")} where id=${id}`
+        const setSqlK=`UPDATE DApp SET  ${Object.keys(tokenData).map(v=>`${v}=?`).join(",")} where id=${id}`
         const setSqlV  =  Object.keys(tokenData).map(k => tokenData[k])
      
         const insertR = await DBhelper.queryMysql(MYSQL_OPEN, {
@@ -235,5 +235,11 @@ module.exports = class TokenController extends CoreController {
         return insertR;
     }
 
+
+    async getTageList(params){
+        return await Coinhelper.getTageList(params);
+    }
+
     
 }
+

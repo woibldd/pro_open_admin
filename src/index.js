@@ -5,13 +5,24 @@ const jwt = require('jsonwebtoken');
 const express = require('express');
 const bodyParser = require('body-parser');
 const Logger = require('./tool/loggerhelper');
-
+const compression = require("compression");
+const expresSstaticGzip  =  require("express-static-gzip")
 const app = express();
 app.set('env', CONFIG.debug ? 'development' : 'production');
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 const router = express.Router();
+router.use(compression()) // gzip 测试环境 实际走cdn
+router.use(expresSstaticGzip(__dirname + '/dist', {
+    maxAge: '3d',
+    setHeaders: function setCustomCacheControl(res, currentFilePath, stat) {
+		if (currentFilePath.match(/\index\.html$/)) {
+		  // Custom Cache-Control for HTML files
+		  res.setHeader('Cache-Control', 'no-cache');
+		}
+	  }
+}))
 router.use('/admin',express.static(__dirname + '/dist'));
 router.use(function(req, res, next) {
 	var ts = new Date().getTime();

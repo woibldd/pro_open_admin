@@ -56,7 +56,7 @@
         <el-row :gutter="10" class="content" v-for="row in Tools" :key="row.id">
           <el-col :xs="24" :sm="8">
             <el-form-item label="工具名称">
-              {{ row.toolname || '--' }}
+              {{ row.title || '--' }}
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="8">
@@ -272,7 +272,7 @@ export default {
       const langData = this.languageTypeOptions.find(v => v.lang == val)
       Object.assign(this.dataInfo, { abort: '', name: '', whitepaper: '', tools: [] }, (langData && langData.data) || {})
 
-      this.Tools = this.dataInfo.tools || []
+      this.Tools = JSON.parse(this.dataInfo.tools || '[]')  || []
     },
     async price_from_change(val) {
       console.log({ val })

@@ -25,7 +25,7 @@
         <el-divider class="title">基本信息</el-divider>
         <!-- <h3 class="title">基本信息</h3> -->
         <el-row :gutter="10" class="content">
-          <el-col :xs="col.xs || 24" :sm="col.sm || 6" v-for="col in IconColumus" :key="col.key">
+          <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in IconColumus" :key="col.key">
             <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
               <el-link :href="dataInfo[col.key] || col.value" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key] || col.value) : dataInfo[col.key] || col.value }}</el-link>
             </el-form-item>
@@ -38,7 +38,7 @@
           </el-col>
         </el-row>
 
-        <el-divider class="title">token介绍</el-divider>
+        <!-- <el-divider class="title">token介绍</el-divider>
 
         <el-row :gutter="10" class="content">
           <el-col :xs="col.xs || 24" :sm="col.sm || 6" :offset="col.offset || 0" v-for="col in OtherColumus" :key="col.key" :style="col.style || {}">
@@ -49,7 +49,7 @@
               {{ dataInfo[col.key] || col.value }}
             </el-form-item>
           </el-col>
-        </el-row>
+        </el-row> -->
 
         <el-divider class="title" v-if="Tools.length > 0">tools工具</el-divider>
 
@@ -74,7 +74,7 @@
 
         <el-divider class="title">其他信息</el-divider>
         <el-row :gutter="10" class="content">
-          <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in Other1Columus" :key="col.key">
+          <el-col class="my-col" :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in Other1Columus" :key="col.key">
             <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
               <el-link v-if="dataInfo[col.key]" :href="col.value" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key]) : dataInfo[col.key] }}</el-link>
               <span v-else>--</span>
@@ -127,17 +127,17 @@
 
 <script>
 import ContainerHeader from '@/components/ContainerHeader'
-import { getDetails, verify, getPrice, update } from '@/api/token'
+import { getDetails, verify, getPrice, update } from '@/api/dapp'
 import { parseTime, UpperCase } from '@/utils'
 import { BigNumber } from 'bignumber.js'
 const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
 
 const IconColumus = [
-  { label: 'Token 名称:', key: 'name', type: 'string', show: false, value: '' },
-  { label: '币名(标识):', key: 'coin', type: 'string', show: false, value: '' },
-  { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
-  { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: UpperCase },
-  { label: '合约:', key: 'contract', type: 'string', sm: 24, show: false, value: '' }
+  { label: 'DApp 名称:', key: 'name', type: 'string', show: false, value: '' },
+  { label: '主链:', key: 'chains', type: 'string', show: false, value: '', filter: UpperCase },
+  { label: 'Tags', key: 'tags', type: 'string', show: false, value: '' },
+  // { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
+  // { label: '合约:', key: 'contract', type: 'string', sm: 24, show: false, value: '' }
 
   // { label: '浏览器（账户）', key: 'coin', type: 'string', show: false, value: '' },
 ]
@@ -147,7 +147,6 @@ const OtherColumus = [
   { label: '精度:', key: 'decimals', type: 'string', show: false, value: '--' },
   // { label: '币价:', key: 'price', type: 'string', show: false, value: '--' },
   { label: '币价来源:', key: 'price_from', type: 'string', show: false, value: '--' },
-
   { label: '货币介绍:', key: 'about', sm: 20, type: 'string', show: false, value: '--' }
 ]
 
@@ -290,7 +289,7 @@ export default {
     },
     async submitApproval(type) {
       if (type == 1) {
-        const r = await this.$confirm('确认通过后将在页面中显示改币种，确认审核通过？')
+        const r = await this.$confirm('确认通过后将在页面中显示改DApp，确认审核通过？')
         if (r !== 'confirm') return
       } else {
         await this.$refs['dataForm'].validate()
@@ -375,6 +374,9 @@ export default {
         padding-left: 10px;
         .el-form-item__content {
           overflow: hidden;
+        }
+        .my-col {
+          min-height: 42px;
         }
       }
     }

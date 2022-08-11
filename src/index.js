@@ -74,7 +74,8 @@ function registerController(lib){
 
 	const fun = (req, res) => {
 		(async() => {
-			try {
+			try { 
+				console.log({req, res})
 				const method = req.params.method;
 				const params = como.extend(req.query, req.body);
 				if(instance[method]){

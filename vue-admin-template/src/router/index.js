@@ -247,7 +247,7 @@ export const asyncRoutes = [
     redirect: '/approval/token/list',
     name: 'Approval',
     meta: { title: '审核列表', icon: 'el-icon-s-help' },
-    children: [...TokenApproval, ...NFTApproval,...DAppApproval]
+    children: [...TokenApproval,...DAppApproval]
   },
   {
     path: '/userManagemen',

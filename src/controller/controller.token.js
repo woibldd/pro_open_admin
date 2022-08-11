@@ -56,9 +56,9 @@ module.exports = class TokenController extends CoreController {
         delete token.owner_eth_address;
         delete token.search_key;
 
-        token.multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
+        // token.multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
         return token;
-    }
+    } 
 
     /**
      * 审核同步到ms_coin
@@ -98,6 +98,8 @@ module.exports = class TokenController extends CoreController {
             });
             return true;
         }
+
+ 
         
         // 审核通过
         // 判断线上是否存在
@@ -105,8 +107,10 @@ module.exports = class TokenController extends CoreController {
             start: 0,
             limit: 1,
             chain: token.chain,
-            contract: token.contract
+            contracts: [token.contract]
         };
+
+        //"host_coin": "http://ms.coin:8876",
         const coins = await NetHelper.post({
             url: `${CONFIG.host_coin}/admin/coinList`,
             json: true,
@@ -117,7 +121,10 @@ module.exports = class TokenController extends CoreController {
         // token是否已经上线
         if (coins && coins.list && coins.list.length > 0) {
             coin = coins.list[0];
-            if (coin.owner_eth_address !== token.owner_eth_address || id !== coin.open_id) throw new Error('线上已存在该Token, 请重新确认');
+            if (coin.owner_eth_address !== token.owner_eth_address || id !== coin.open_id) 
+            throw new Error('线上已存在该Token, 请重新确认');
+            // throw new Error(`coin.address:${coin.owner_eth_address}, coin.id:${coin.open_id}, token.address:${token.owner_eth_address}, token:id${id}， ${coins.list.length}`);
+            // throw new Error(JSON.stringify(result))
         }
 
         // 同步上线

@@ -30,7 +30,7 @@ export function  getDetails(params = {
     method: 'get',
     params
   })
-}
+} 
 
 export function update(data = {}) {
   return request({

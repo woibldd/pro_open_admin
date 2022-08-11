@@ -36,14 +36,19 @@
           <el-image style="width: 40px; height: 40px; border-radius:50%" :src="row.icon" fit="contain"></el-image>
         </template>
       </el-table-column>
-      <el-table-column label="币名(symbol)" fixed="left" align="center">
+      <el-table-column label="DApp名称" fixed="left" width="110px" align="center">
         <template slot-scope="{ row }">
-          {{ row.coin }}
+          <span>{{ row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="主链(chain)" fixed="left" width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.chain }}</span>
+          <span>{{ row.chains }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Tags" fixed="left" align="center">
+        <template slot-scope="{ row }">
+          {{ row.tags }}
         </template>
       </el-table-column>
 
@@ -86,7 +91,7 @@
           <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
             拒绝
           </el-button>
-          <el-button size="mini" @click.stop="$router.push(`/approval/token/detail/${row.id}`)">
+          <el-button size="mini" @click.stop="$router.push(`/approval/dapp/detail/${row.id}`)">
             查看
           </el-button>
         </template>
@@ -104,16 +109,16 @@
           <el-image style="width: 40px; height: 40px;border-radius:50%" :src="appovalFormData.data.icon" fit="contain"></el-image>
         </el-form-item>
 
-        <el-form-item label="币名：">
+        <!-- <el-form-item label="币名：">
           <span>{{ appovalFormData.data.coin }} </span>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="主链：">
-          <span>{{ appovalFormData.data.chain }}</span>
+          <span>{{ appovalFormData.data.chain }} </span>
         </el-form-item>
-        <el-form-item label="合约地址：">
-          <span>{{ appovalFormData.data.contract }}</span>
+        <el-form-item label="Tags：">
+          <span>{{ appovalFormData.data.tags }}</span>
         </el-form-item>
-        <el-form-item label="价格来源：">
+        <!-- <el-form-item label="价格来源：">
           <el-select v-model="appovalFormData.data.price_from" placeholder="价格来源（auto）" class="filter-item">
             <el-option v-for="item in price_from_list" :key="item.key" :value="item.key">
               <span style="float: left">{{ item.key }}</span>
@@ -123,19 +128,19 @@
         </el-form-item>
         <el-form-item label="当前币价：">
           <span style="padding-left:5px; color: #8492a6; font-size: 20px">${{ icon_price }}</span>
-        </el-form-item>
+        </el-form-item> -->
 
         <!-- 多语言 -->
         <el-form-item label="全名：">
           <span>{{ appovalFormData.data.name }}</span>
         </el-form-item>
-        <el-form-item label="货币介绍：">
+        <el-form-item label="DApp介绍：">
           <span>{{ appovalFormData.data.about }}</span>
         </el-form-item>
 
-        <el-form-item label="发行总量：">
+        <!-- <el-form-item label="发行总量：">
           <span>{{ appovalFormData.data.supply_total }}</span>
-        </el-form-item>
+        </el-form-item> -->
         <!-- <el-form-item label="总市值">
           <span>{{ appovalFormData.data.contract }}</span>
         </el-form-item> -->

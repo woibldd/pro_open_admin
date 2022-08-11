@@ -56,7 +56,7 @@ module.exports = class TokenController extends CoreController {
         delete token.owner_eth_address;
         delete token.search_key;
 
-        token.multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
+        // token.multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
         return token;
     }
 
@@ -81,6 +81,8 @@ module.exports = class TokenController extends CoreController {
             sql: `SELECT * FROM DApp WHERE id = ?`,
             values: [parseInt(id)]
         });
+        // throw new Error(JSON.stringify(result));
+
         if (!result || result.length === 0) throw new Error('Token not found');
         const token = result[0];
         if (token.status === this.tokenStatus.LISTED) throw new Error('Token is already listed');
@@ -96,49 +98,85 @@ module.exports = class TokenController extends CoreController {
                 sql: `UPDATE DApp SET status=?, remark=? WHERE id=? `,
                 values: [ status, remark || '', id ]
             });
-            return true;
-        }
+            // const rrrr =await DBhelper.queryMysql(MYSQL_OPEN, {
+            //     sql: `select * from  DApp WHERE id=? `,
+            //     values: [  id ]
+            // });
+            // throw new Error(JSON.stringify(rrrr));
+            return true;  
+        } 
+ 
         
+        // throw new Error(`2222222222222`); 
         // 审核通过
         // 判断线上是否存在
         const body = {
             start: 0,
             limit: 1,
             chain: token.chain,
-            contract: token.contract
+            name: token.name
         };
         const coins = await NetHelper.post({
-            url: `${CONFIG.host_coin}/admin/coinList`,
+            url: `${CONFIG.host_dapp}/admin/dappList`,
             json: true,
             body
         });
+
+        // throw new Error(JSON.stringify(coins));
         
         let coin = null;
         // token是否已经上线
         if (coins && coins.list && coins.list.length > 0) {
             coin = coins.list[0];
-            if (coin.owner_eth_address !== token.owner_eth_address || id !== coin.open_id) throw new Error('线上已存在该Token, 请重新确认');
+            if (coin.owner_eth_address !== token.owner_eth_address || id !== coin.open_id) 
+                throw new Error('线上已存在该Token, 请重新确认');
+                // throw new Error(`coin.address:${coin.owner_eth_address}, coin.id:${coin.open_id}, token.address:${token.owner_eth_addres}, token:id${id}`);
         }
 
+ 
         // 同步上线
         const data = Object.assign(token, {
-            decimals: token.decimals || 18,
-            priceFrom: token.price_from || 'auto',
-            price: token.price || 0,
-            browserAccount: token.browser_account || '',
-            browserTx: token.browser_tx || '',
-            browserQuote: token.browser_quote || '',
-            version: token.version || 0,
+            name: token.name || '',
+            chain: token.chain || '',
+            tags: token.tags || '',
+            icon: token.icon || '',
+            url: token.website || '',
+            telegram: token.telegram || '',
+            twitter: token.twitter || '',
+            discord: token.discord || '',
+            facebook: token.facebook || '',
+            discord: token.discord || '',
+            version: token.current_version || 0,
             sort: token.sort || 0,
             open_id: id,
+            intro: token.intro || '',
+            flag: (token.name || '').toLowerCase(),
+            description: token.description || '',
+            type: token.type || '', 
+            email: token.email || '',
+            weibo: token.weibo || '',
+            source: token.source || '',
+            users: token.users || 0,
+            amounts: token.amounts || 0,
+            trans: token.trans || 0,
+            count: token.count || 0,
+            relationDocTitle: '',
+            relationDocURL: '',
+            keywords: '',
+            chainTag:  '',
+            adIcon:  '',
+            adUrl:  '',
+            adLastTime:  0,
+            audit:  1,
+            hostName:  '',
             status: 1,                                       // ms_coin状态，上线
-        });
+        }); 
         delete data.id;
 
         // 线上存在该coin且归属于当前开放平台用户，则更新；否则，新增
         if (coin) data.id = coin.id;
         const updatedCoins = await NetHelper.post({
-            url: `${CONFIG.host_coin}/admin/openSyncCoin`,
+            url: `${CONFIG.host_dapp}/admin/openSyncDapp`,
             json: true,
             body: data
         });
@@ -147,16 +185,16 @@ module.exports = class TokenController extends CoreController {
         if (updatedCoins && updatedCoins.length > 0) {
             updatedCoin = updatedCoins[0];
             
-            if (!token.coin_id) {
+            if (!token.dapp_id) {
                 // coin新增后更新coin_id
                 await DBhelper.queryMysql(MYSQL_OPEN, {
-                    sql: `UPDATE Token SET coin_id=?, status=?, remark=?, is_online=? WHERE id=?`,
+                    sql: `UPDATE DApp SET dapp_id=?, status=?, remark=?, is_online=? WHERE id=?`,
                     values: [ updatedCoin.id, status, remark || '', updatedCoin.status || 1, id ]
                 });
             } else {
                 // coin更新后
                 await DBhelper.queryMysql(MYSQL_OPEN, {
-                    sql: `UPDATE Token SET status=?, remark=?, is_online=? WHERE id=? `,
+                    sql: `UPDATE DApp SET status=?, remark=?, is_online=? WHERE id=? `,
                     values: [ status, remark || '', updatedCoin.status || 1, id ]
                 });
             }

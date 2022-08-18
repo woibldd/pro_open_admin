@@ -85,7 +85,7 @@
 
       <el-table-column label="操作" fixed="right" align="center" min-width="100" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
-          <el-button v-if="row.status == 0" type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
+          <el-button  type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
             审核通过
           </el-button>
           <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
@@ -113,37 +113,46 @@
           <span>{{ appovalFormData.data.coin }} </span>
         </el-form-item> -->
         <el-form-item label="主链：">
-          <span>{{ appovalFormData.data.chain }} </span>
+          <span>{{ appovalFormData.data.chains }} </span>
         </el-form-item>
         <el-form-item label="Tags：">
           <span>{{ appovalFormData.data.tags }}</span>
         </el-form-item>
-        <!-- <el-form-item label="价格来源：">
-          <el-select v-model="appovalFormData.data.price_from" placeholder="价格来源（auto）" class="filter-item">
-            <el-option v-for="item in price_from_list" :key="item.key" :value="item.key">
-              <span style="float: left">{{ item.key }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">${{ item.value }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="当前币价：">
-          <span style="padding-left:5px; color: #8492a6; font-size: 20px">${{ icon_price }}</span>
-        </el-form-item> -->
-
         <!-- 多语言 -->
-        <el-form-item label="全名：">
+        <el-form-item label="DApp名称：">
           <span>{{ appovalFormData.data.name }}</span>
         </el-form-item>
         <el-form-item label="DApp介绍：">
-          <span>{{ appovalFormData.data.about }}</span>
+          <span>{{ appovalFormData.data.introduction }}</span>
+        </el-form-item> 
+        <el-form-item label="URL：">
+          <span>{{ appovalFormData.data.url }}</span>
         </el-form-item>
+        <el-form-item label="官网">
+          <span>{{ appovalFormData.data.website }}</span>
+        </el-form-item>
+        <!-- <el-form-item label="Github:">
+          <span>{{ appovalFormData.data.github }}</span>
+        </el-form-item>
+        <el-form-item label="Telegram:">
+          <span>{{ appovalFormData.data.telegram }}</span>
+        </el-form-item>
+        <el-form-item label="Facebook:">
+          <span>{{ appovalFormData.data.facebook }}</span>
+        </el-form-item>
+        <el-form-item label="Discord:">
+          <span>{{ appovalFormData.data.discord }}</span>
+        </el-form-item> -->
+        <!-- <el-form-item label="邮箱:">
+          <span>{{ appovalFormData.data.email }}</span>
+        </el-form-item>
+        <el-form-item label="社区信息:">
+          <span>{{ appovalFormData.data.community_info }}</span>
+        </el-form-item>
+        <el-form-item label="推荐人:">
+          <span>{{ appovalFormData.data.recommender }}</span>
+        </el-form-item> -->
 
-        <!-- <el-form-item label="发行总量：">
-          <span>{{ appovalFormData.data.supply_total }}</span>
-        </el-form-item> -->
-        <!-- <el-form-item label="总市值">
-          <span>{{ appovalFormData.data.contract }}</span>
-        </el-form-item> -->
         <el-form-item v-if="appovalFormData.type != 'approval'" prop="remark" label="拒绝原因" :rules="[{ required: true, message: '请填写拒绝原因' }]" style="max-width:100%">
           <el-input style="max-width:100%" v-model="appovalFormData.remark" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="请填写拒绝原因" />
         </el-form-item>
@@ -285,7 +294,7 @@ export default {
       clip(text, event)
     },
     handleRowClick({ id }) {
-      this.$router.push(`/approval/token/detail/${id}`)
+      // this.$router.push(`/approval/dapp/detail/${id}`)
     },
     sortChange(data) {
       const { prop, order } = data

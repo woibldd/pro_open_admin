@@ -106,8 +106,7 @@ module.exports = class TokenController extends CoreController {
             return true;  
         } 
  
-        
-        // throw new Error(`2222222222222`); 
+         
         // 审核通过
         // 判断线上是否存在
         const body = {
@@ -137,10 +136,12 @@ module.exports = class TokenController extends CoreController {
         // 同步上线
         const data = Object.assign(token, {
             name: token.name || '',
-            chain: token.chain || '',
+            chain: token.chains || '',
+            chainTag: token.chains || '',
             tags: token.tags || '',
             icon: token.icon || '',
-            url: token.website || '',
+            url: token.url || '',
+            hostName:  token.website || '',
             telegram: token.telegram || '',
             twitter: token.twitter || '',
             discord: token.discord || '',
@@ -149,7 +150,7 @@ module.exports = class TokenController extends CoreController {
             version: token.current_version || 0,
             sort: token.sort || 0,
             open_id: id,
-            intro: token.intro || '',
+            intro: token.introduction || '',
             flag: (token.name || '').toLowerCase(),
             description: token.description || '',
             type: token.type || '', 
@@ -160,16 +161,17 @@ module.exports = class TokenController extends CoreController {
             amounts: token.amounts || 0,
             trans: token.trans || 0,
             count: token.count || 0,
+            url: token.url || '',
+            keywords: token.keywords || 0,
             relationDocTitle: '',
             relationDocURL: '',
-            keywords: '',
             chainTag:  '',
             adIcon:  '',
             adUrl:  '',
             adLastTime:  0,
             audit:  1,
             hostName:  '',
-            status: 1,                                       // ms_coin状态，上线
+            status: 0,                                       // ms_coin状态，上线
         }); 
         delete data.id;
 
@@ -189,22 +191,22 @@ module.exports = class TokenController extends CoreController {
                 // coin新增后更新coin_id
                 await DBhelper.queryMysql(MYSQL_OPEN, {
                     sql: `UPDATE DApp SET dapp_id=?, status=?, remark=?, is_online=? WHERE id=?`,
-                    values: [ updatedCoin.id, status, remark || '', updatedCoin.status || 1, id ]
+                    values: [ updatedCoin.id, status, remark || '', updatedCoin.status || 0, id ]
                 });
             } else {
                 // coin更新后
                 await DBhelper.queryMysql(MYSQL_OPEN, {
                     sql: `UPDATE DApp SET status=?, remark=?, is_online=? WHERE id=? `,
-                    values: [ status, remark || '', updatedCoin.status || 1, id ]
+                    values: [ status, remark || '', updatedCoin.status || 0, id ]
                 });
             }
         }
 
         // 多语言同步
-        const multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
+        const multiLanguageList = await LanguageHelper.batchGet('Dapp', [ { id } ]);
         if (!multiLanguageList || multiLanguageList.length == 0) return true;
 
-        await LanguageHelper.batchSet('coin', 'Coins', multiLanguageList.map(_ => {
+        await LanguageHelper.batchSet('dapp', 'DApps', multiLanguageList.map(_ => {
             const data = _.data;
             data.browserAccount = data.browser_account;
             data.browserTx = data.browser_tx;

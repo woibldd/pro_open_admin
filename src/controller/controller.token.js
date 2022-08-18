@@ -137,8 +137,12 @@ module.exports = class TokenController extends CoreController {
             browserQuote: token.browser_quote || '',
             version: token.version || 0,
             sort: token.sort || 0,
+            issue_data: token.issue_data || '',
+            email:  token.email || '',
+            community_info: token.community_info ||  '',
+            recommender: token.recommender ||  '',
             open_id: id,
-            status: 1,                                       // ms_coin状态，上线
+            status: 0,                                       // ms_coin状态，上线
         });
         delete data.id;
 
@@ -165,7 +169,7 @@ module.exports = class TokenController extends CoreController {
                 await DBhelper.queryMysql(MYSQL_OPEN, {
                     sql: `UPDATE Token SET status=?, remark=?, is_online=? WHERE id=? `,
                     values: [ status, remark || '', updatedCoin.status || 1, id ]
-                });
+                }); 
             }
         }
 
@@ -183,7 +187,7 @@ module.exports = class TokenController extends CoreController {
             delete data.browser_quote;
             _.data = data;
             return _;
-        }));
+        })); 
         
         return true;
     }

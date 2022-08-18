@@ -6,8 +6,8 @@
         <el-avatar class="icon" shape="circle" :size="50" fit="fit" :src="dataInfo.icon" alt="alt"></el-avatar>
         <h1 class="symbol">{{ dataInfo.coin }}</h1>
         <div class="name">{{ dataInfo.name }}</div>
-        <el-tag class="chain" size="small" type="info" style="margin-right:5px">{{ dataInfo.chain | UpperCase }}链</el-tag>
-        <el-tag size="small" type="info" v-if="dataInfo.contract || dataInfo.contract.length == 2">代币</el-tag>
+        <!-- <el-tag class="chain" size="small" type="info" style="margin-right:5px">{{ dataInfo.chains | UpperCase }} 链</el-tag> -->
+        <!-- <el-tag size="small" type="info" v-if="dataInfo.contract || dataInfo.contract.length == 2">代币</el-tag> -->
         <el-select v-model="lang" placeholder="语言展示" class="lang" @change="langChange">
           <el-option v-for="item in languageTypeOptions" :key="item.lang" :label="item.lang" :value="item.lang" />
         </el-select>
@@ -50,27 +50,7 @@
             </el-form-item>
           </el-col>
         </el-row> -->
-
-        <el-divider class="title" v-if="Tools.length > 0">tools工具</el-divider>
-
-        <el-row :gutter="10" class="content" v-for="row in Tools" :key="row.id">
-          <el-col :xs="24" :sm="8">
-            <el-form-item label="工具名称">
-              {{ row.toolname || '--' }}
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="8">
-            <el-form-item label="图标链接">
-              <el-avatar :title="row.icon" shape="circle" :size="30" fit="fit" :src="row.icon" alt="alt"></el-avatar>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="8">
-            <el-form-item label="URL">
-              <el-link v-if="row.url" :href="row.url" target="_blank"> {{ row.url }}</el-link>
-              <span v-else>--</span>
-            </el-form-item>
-          </el-col>
-        </el-row>
+        
 
         <el-divider class="title">其他信息</el-divider>
         <el-row :gutter="10" class="content">
@@ -137,8 +117,12 @@ const IconColumus = [
   { label: '主链:', key: 'chains', type: 'string', show: false, value: '', filter: UpperCase },
   { label: 'Tags', key: 'tags', type: 'string', show: false, value: '' },
   // { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
-  // { label: '合约:', key: 'contract', type: 'string', sm: 24, show: false, value: '' }
-
+  { label: '关键字', key: 'keywords', type: 'string', show: false, value: '' },
+  // { label: '合约', key: 'contract_setting', type: 'string', show: false, value: '' },
+  { label: 'URL', key: 'url', type: 'string', show: false, value: '' },
+  // { label: '官网', key: 'website', type: 'string', show: false, value: '' },
+  { label: '简介', key: 'introduction', type: 'string', show: false, value: '' },
+  // { label: '合约:', key: 'contract', type: 'string', sm: 24, show: false, value: '' } 
   // { label: '浏览器（账户）', key: 'coin', type: 'string', show: false, value: '' },
 ]
 
@@ -383,6 +367,19 @@ export default {
   }
   .footer {
     text-align: center;
+  }
+}
+</style>
+
+<style lang="scss">
+.info {
+  .content { 
+    .el-form-item__content {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; 
+    }
   }
 }
 </style>

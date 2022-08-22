@@ -65,7 +65,20 @@
           </el-col>
         </el-row>
 
-        <el-divider class="title">可修改信息</el-divider>
+        <el-divider class="title">多语言</el-divider>
+        <el-row :gutter="10" class="content">
+          <el-col class="my-col" :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in langDataColumus" :key="col.key">
+            <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
+              <el-link v-if="langData[col.key]" :href="langData[col.key]" target="_blank">{{ col.filter ? col.filter(langData[col.key]) : langData[col.key] }}</el-link>
+              <span v-else>--</span>
+            </el-form-item>
+            <el-form-item v-else :label="col.label || col.key">
+              {{ langData[col.key] || col.value || '--' }}
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- <el-divider class="title">可修改信息</el-divider>
 
         <el-form-item label="币价来源：">
           <el-select v-model="dataInfo.price_from" :disabled="dataInfo.status != 0" placeholder="价格来源（auto）" class="filter-item" @change="price_from_change">
@@ -74,7 +87,7 @@
               <span style="float: right; color: #8492a6; font-size: 13px">${{ item.value }}</span>
             </el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
       </div>
     </el-form>
 
@@ -107,10 +120,10 @@
 
 <script>
 import ContainerHeader from '@/components/ContainerHeader'
-import { getDetails, verify, getPrice, update } from '@/api/dapp'
+import { getDetails, verify, update, getMultiLanguageList } from '@/api/dapp'
 import { parseTime, UpperCase } from '@/utils'
 import { BigNumber } from 'bignumber.js'
-const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
+const languageTypeOptions = []
 
 const IconColumus = [
   { label: 'DApp 名称:', key: 'name', type: 'string', show: false, value: '' },
@@ -126,21 +139,28 @@ const IconColumus = [
   // { label: '浏览器（账户）', key: 'coin', type: 'string', show: false, value: '' },
 ]
 
-const OtherColumus = [
-  { label: '总供应量:', key: 'supply_total', type: 'string', show: false, value: '--' },
-  { label: '精度:', key: 'decimals', type: 'string', show: false, value: '--' },
-  // { label: '币价:', key: 'price', type: 'string', show: false, value: '--' },
-  { label: '币价来源:', key: 'price_from', type: 'string', show: false, value: '--' },
-  { label: '货币介绍:', key: 'about', sm: 20, type: 'string', show: false, value: '--' }
+const OtherColumus = [ 
 ]
 
 const Other1Columus = [
   { label: '白皮书:', key: 'whitepaper', type: 'href', show: false, value: '' },
   { label: 'Twitter:', key: 'twitter', type: 'href', show: false, value: '' },
-  { label: '官网:', key: 'website', type: 'href', show: false, value: '' },
+  { label: 'Discord:', key: 'discord', type: 'href', show: false, value: '' },
   { label: 'GitHub:', key: 'github', type: 'href', show: false, value: '' },
   { label: 'Telegram:', key: 'telegram', type: 'href', show: false, value: '' },
-  { label: 'Facebook:', key: 'facebook', type: 'href', show: false, value: '' }
+  { label: 'Facebook:', key: 'facebook', type: 'href', show: false, value: '' },
+  { label: '邮箱:', key: 'email', type: 'string', show: false, value: '' },
+  { label: '社区信息:', key: 'community_info', type: 'string', show: false, value: '' },
+  { label: 'recommender:', key: 'recommender', type: 'string', show: false, value: '' }
+]
+
+const langDataColumus = [
+  { label: '名称:', key: 'name', type: 'string', show: false, value: '' },
+  { label: 'URL:', key: 'url', type: 'href', show: false, value: '' },
+  { label: '介绍:', key: 'intro', type: 'string', show: false, value: '' },
+  { label: '描述:', key: 'description', type: 'string', show: false, value: '' },
+  { label: '相关教程标题:', key: 'relationDocTitle', type: 'string', show: false, value: '' },
+  { label: '相关教程URL:', key: 'relationDocURL', type: 'href', show: false, value: '' },
 ]
 
 const calendarTypeOptions = [
@@ -156,6 +176,7 @@ export default {
       languageTypeOptions,
       price_from_list: [],
       lang: 'en',
+      langData: {},
       oDataInfo: {},
       dataInfo: {
         multiLanguageList: [],
@@ -171,6 +192,7 @@ export default {
       IconColumus,
       OtherColumus,
       Other1Columus,
+      langDataColumus,
       Tools: []
     }
   },
@@ -210,67 +232,38 @@ export default {
           const data = res.data
           this.oDataInfo = data
           this.dataInfo = Object.assign(this.dataInfo, data)
-
-          this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length > 0 ? data.multiLanguageList : [{ id: '', lang: 'en', data }]
-          const { lang } = this.languageTypeOptions[0]
-          this.langChange(lang)
-          this.getPrice()
-          clearInterval(this.timer)
-          this.timer = setInterval(() => {
-            this.getPrice()
-          }, 5000)
-
-          // this.IconColumus = this.IconColumus.map(v => {
-          //   if (data[v.key]) {
-          //     v.show = true
-          //     v.value = data[v.key]
-          //   }
-          //   return v
-          // })
-          // this.OtherColumus = this.OtherColumus.map(v => {
-          //   if (data[v.key]) {
-          //     v.show = true
-          //     v.value = data[v.key]
-          //   }
-          //   return v
-          // })
-          //  this.Other1Columus = this.Other1Columus.map(v => {
-          //   if (data[v.key]) {
-          //     v.show = true
-          //     v.value = data[v.key]
-          //   }
-          //   return v
-          // })
-          // this.tools = this.tools.map(v => {
-          //   if (data[v.key]) {
-          //     v.show = true
-          //     v.value = data[v.key]
-          //   }
-          //   return v
-          // })
+ 
+           this.Other1Columus = this.Other1Columus.map(v => {
+            if (data[v.key]) {
+              v.show = true
+              v.value = data[v.key]
+            }
+            return v
+          }) 
         })
         .catch(err => console.error(err))
+
+     
+      getMultiLanguageList({id: this.$route.params.id})
+        .then(res => {
+          if (!res.data) return 
+          this.languageTypeOptions = res.data  
+          this.dataInfo.multiLanguageList = res.data   
+          this.langChange('en')
+        })
     },
     async langChange(val) {
       const langData = this.languageTypeOptions.find(v => v.lang == val)
-      Object.assign(this.dataInfo, { abort: '', name: '', whitepaper: '', tools: [] }, (langData && langData.data) || {})
+      // Object.assign(this.dataInfo, { abort: '', name: '', whitepaper: '', tools: [] }, (langData && langData.data) || {})
+      this.langData = langData.data
+      console.log('langChange', this.langData, val)
 
-      this.Tools = this.dataInfo.tools || []
+      // this.Tools = this.dataInfo.tools || []
     },
     async price_from_change(val) {
       console.log({ val })
     },
-    async getPrice() {
-      const { data, status } = await getPrice({
-        currency: 'usdt',
-        symbol: this.dataInfo.coin,
-        chain: this.dataInfo.chain,
-        contract: this.dataInfo.contract
-      }).catch(err => ({ status: 5000 }))
-      if (status == 0) {
-        this.price_from_list = Object.entries(data).map(([key, value]) => ({ key: key == 'all' ? 'auto' : key, value }))
-      }
-    },
+     
     async submitApproval(type) {
       if (type == 1) {
         const r = await this.$confirm('确认通过后将在页面中显示改DApp，确认审核通过？')
@@ -361,6 +354,7 @@ export default {
         }
         .my-col {
           min-height: 42px;
+          height: 80px;
         }
       }
     }
@@ -379,6 +373,12 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap; 
+      .el-link--inner {
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; 
+      }
     }
   }
 }

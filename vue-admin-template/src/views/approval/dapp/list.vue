@@ -4,7 +4,7 @@
     <div class="filter-container">
       <el-form :inline="true">
         <el-form-item label="关键字搜索">
-          <el-input v-model="listQuery.search_key"  clearable placeholder="token 合约 主链" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+          <el-input v-model="listQuery.search_key"  clearable placeholder="DApp名称 主链" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
         </el-form-item>
         <el-form-item label="审核状态">
           <el-select v-model="listQuery.status" placeholder="审核状态"  clearable class="filter-item" style="width: 130px">
@@ -13,8 +13,8 @@
         </el-form-item>
 
         <!-- <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select> -->
+          <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
+        </el-select> -->
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
           搜索
         </el-button>
@@ -25,7 +25,7 @@
       </el-form>
     </div>
 
-    <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @sort-change="sortChange" @row-click="handleRowClick">
+    <el-table :key="tableKey" v-loading="listLoading"  :data="list" border fit highlight-current-row style="width: 100%;" @sort-change="sortChange" @row-click="handleRowClick">
       <el-table-column label="ID" fixed="left" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
         <template slot-scope="{ row }">
           <span>{{ row.id }}</span>
@@ -52,11 +52,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="合约地址(contract)" align="center" show-overflow-tooltip>
+      <!-- <el-table-column label="合约地址(contract)" align="center" show-overflow-tooltip>
         <template slot-scope="{ row }">
           <span @click.stop="handleCopy(row.contract, $event)" class="pointer" title="copy">{{ row.contract || '--' }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="提交用户(eth_address)" align="center" show-overflow-tooltip>
         <template slot-scope="{ row }">
           <span @click.stop="handleCopy(row.owner_eth_address, $event)" class="pointer" title="copy">{{ row.owner_eth_address || '--' }}</span>
@@ -85,7 +85,7 @@
 
       <el-table-column label="操作" fixed="right" align="center" min-width="100" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
-          <el-button  type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
+          <el-button v-if="row.status == 0"  type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
             审核通过
           </el-button>
           <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
@@ -99,7 +99,7 @@
     </el-table>
 
     <div style="height:100px"></div>
-    <!-- <ContainerFooter> -->
+    <!-- <ContainerFooter> --> 
     <pagination v-show="total > 0" class="footer-pagination" align="right" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
     <!-- </ContainerFooter> -->
 
@@ -128,9 +128,9 @@
         <el-form-item label="URL：">
           <span>{{ appovalFormData.data.url }}</span>
         </el-form-item>
-        <el-form-item label="官网">
+        <!-- <el-form-item label="官网">
           <span>{{ appovalFormData.data.website }}</span>
-        </el-form-item>
+        </el-form-item> -->
         <!-- <el-form-item label="Github:">
           <span>{{ appovalFormData.data.github }}</span>
         </el-form-item>
@@ -226,7 +226,8 @@ export default {
         importance: undefined,
         search_key: undefined,
         status: undefined,
-        sort: '+id'
+        sort: 'update_time',
+        sortby: 'DESC'
       },
       calendarTypeOptions,
       sortOptions: [
@@ -302,11 +303,16 @@ export default {
         this.sortByID(order)
       }
     },
-    sortByID(order) {
+    sortByID(order) { 
       if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+        this.listQuery.sort = 'id'
+        this.listQuery.sortby = 'ASC'
+      } else if (order === 'descending') {
+        this.listQuery.sort = 'id'
+        this.listQuery.sortby = 'DESC'
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = 'update_time'
+        this.listQuery.sortby = 'DESC'
       }
       this.handleFilter()
     },
@@ -390,8 +396,9 @@ export default {
       )
     },
     getSortClass: function(key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}` ? 'ascending' : 'descending'
+      // const sortby = this.listQuery.sortby
+      // return sortby === `ASC` ? 'ascending' : 'descending'
+      return ''
     }
   }
 }

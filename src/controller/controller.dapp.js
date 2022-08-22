@@ -16,24 +16,24 @@ module.exports = class TokenController extends CoreController {
 
     async list (params) {
         this._checkParams(params, ['pageNum', 'pageSize']);
-        const { pageNum, pageSize, status, search_key } = params;
+        const { pageNum, pageSize, status, search_key, sort, sortby } = params;
 
         const offset = (pageNum - 1) * pageSize;
         let where = `WHERE 1=1`;
         if(search_key){
-            where += ` AND search_key like  '%${search_key}%' OR name like '%${search_key}%'`;
+            where += ` AND chains like  '%${search_key}%' OR name like '%${search_key}%'`;
         }
         if (status) {
             where += ` AND status=${status} `;
-        }
-       
+        } 
+        let orderby = `ORDER BY ${sort} ${sortby}`
+        
 
-     
-       
 
         const totalCount = await DBhelper.queryMysql(MYSQL_OPEN, `SELECT count(*) as count FROM DApp ${where}`);
         const result = await DBhelper.queryMysql(MYSQL_OPEN, {
-            sql: `SELECT * FROM DApp ${where} ORDER BY create_time DESC LIMIT ?,?`,
+            // sql: `SELECT * FROM DApp ${where} ORDER BY create_time DESC LIMIT ?,?`,
+            sql: `SELECT * FROM DApp ${where} ${orderby} LIMIT ?,?`,
             values: [parseInt(offset), parseInt(pageSize)]
         });
 
@@ -76,6 +76,7 @@ module.exports = class TokenController extends CoreController {
     async verify (params) {
         this._checkParams(params, ['sessionId', 'id', 'status']);
         const { id, status, remark, sessionId } = params;
+        
 
         const result = await DBhelper.queryMysql(MYSQL_OPEN, {
             sql: `SELECT * FROM DApp WHERE id = ?`,
@@ -132,11 +133,14 @@ module.exports = class TokenController extends CoreController {
                 // throw new Error(`coin.address:${coin.owner_eth_address}, coin.id:${coin.open_id}, token.address:${token.owner_eth_addres}, token:id${id}`);
         }
 
+
+        const multiLanguageListnew = await LanguageHelper.batchGet('Dapp', [ { id } ]);
+        // const multtLangString = JSON.stringify(multiLanguageListnew)
  
         // 同步上线
         const data = Object.assign(token, {
             name: token.name || '',
-            chain: token.chains || '',
+            chain: token.chain || '',
             chainTag: token.chains || '',
             tags: token.tags || '',
             icon: token.icon || '',
@@ -163,9 +167,9 @@ module.exports = class TokenController extends CoreController {
             count: token.count || 0,
             url: token.url || '',
             keywords: token.keywords || 0,
+            langList: multiLanguageListnew || [],
             relationDocTitle: '',
-            relationDocURL: '',
-            chainTag:  '',
+            relationDocURL: '', 
             adIcon:  '',
             adUrl:  '',
             adLastTime:  0,
@@ -203,23 +207,23 @@ module.exports = class TokenController extends CoreController {
         }
 
         // 多语言同步
-        const multiLanguageList = await LanguageHelper.batchGet('Dapp', [ { id } ]);
-        if (!multiLanguageList || multiLanguageList.length == 0) return true;
+        // const multiLanguageList = await LanguageHelper.batchGet('Dapp', [ { id } ]);
+        // if (!multiLanguageList || multiLanguageList.length == 0) return true;
 
-        await LanguageHelper.batchSet('dapp', 'DApps', multiLanguageList.map(_ => {
-            const data = _.data;
-            data.browserAccount = data.browser_account;
-            data.browserTx = data.browser_tx;
-            data.browserQuote = data.browser_quote;
-            delete data.browser_account;
-            delete data.browser_tx;
-            delete data.browser_quote;
-            _.data = data;
-            return _;
-        }));
+        // await LanguageHelper.batchSet('dapp', 'DApps', multiLanguageList.map(_ => {
+        //     const data = _.data; 
+        //     _.data = data;
+        //     return _;
+        // }));
         
         return true;
     }
+
+    async getMultiLanguageList(params) {
+        const { id } = params; 
+        return await LanguageHelper.batchGet('Dapp', [ { id } ]);
+    }
+
     // symbol', 'currency', 'chain', 'contract'
     async getPrice(params){
         return await Coinhelper.getPrice(params);

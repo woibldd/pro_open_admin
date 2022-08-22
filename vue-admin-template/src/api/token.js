@@ -46,3 +46,13 @@ export function verify(data = {}) {
     data
   })
 }
+
+
+export function getMultiLanguageList( params) {
+  return request({
+    url: '/token/getMultiLanguageList',
+    method: 'get',
+    params
+  })
+}
+

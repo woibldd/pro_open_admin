@@ -212,7 +212,8 @@ export default {
         importance: undefined,
         search_key: undefined,
         status: undefined,
-        sort: '+id'
+        sort: 'update_time',
+        sortby: 'DESC'
       },
       calendarTypeOptions,
       sortOptions: [
@@ -280,7 +281,7 @@ export default {
       clip(text, event)
     },
     handleRowClick({ id }) {
-      this.$router.push(`/approval/token/detail/${id}`)
+      // this.$router.push(`/approval/token/detail/${id}`)
     },
     sortChange(data) {
       const { prop, order } = data
@@ -290,9 +291,14 @@ export default {
     },
     sortByID(order) {
       if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+        this.listQuery.sort = 'id'
+        this.listQuery.sortby = 'ASC'
+      } else if (order === 'descending') {
+        this.listQuery.sort = 'id'
+        this.listQuery.sortby = 'DESC'
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = 'update_time'
+        this.listQuery.sortby = 'DESC'
       }
       this.handleFilter()
     },
@@ -376,8 +382,9 @@ export default {
       )
     },
     getSortClass: function(key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}` ? 'ascending' : 'descending'
+      // const sort = this.listQuery.sort
+      // return sort === `+${key}` ? 'ascending' : 'descending'
+      return ''
     }
   }
 }

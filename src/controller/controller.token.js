@@ -66,6 +66,10 @@ module.exports = class TokenController extends CoreController {
         return await LanguageHelper.batchGet('Token', [ { id } ]);
     }
 
+    async getChainList() {
+        return await Coinhelper.getChainlist()
+    }
+
     /**
      * 审核同步到ms_coin
      * 1. search_key ${userId-chain-contract}，多个地址可上传相同的token

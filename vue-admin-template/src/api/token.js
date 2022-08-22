@@ -56,3 +56,11 @@ export function getMultiLanguageList( params) {
   })
 }
 
+// export function getChainList(params) {
+//   return request({
+//     url: '/token/getChainList',
+//     method: 'get',
+//     params
+//   })
+// }
+

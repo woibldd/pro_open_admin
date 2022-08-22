@@ -130,6 +130,7 @@
 import ContainerHeader from '@/components/ContainerHeader'
 import { getDetails, verify, getPrice, update, getMultiLanguageList } from '@/api/token'
 import { parseTime, UpperCase } from '@/utils'
+import {getChainName} from '@/utils/chain-help'
 import { BigNumber } from 'bignumber.js'
 const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
 
@@ -137,7 +138,7 @@ const IconColumus = [
   { label: 'Token 名称:', key: 'name', type: 'string', show: false, value: '' },
   { label: '币名(标识):', key: 'coin', type: 'string', show: false, value: '' },
   { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
-  { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: UpperCase },
+  { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: getChainName },
   { label: '发布日期:', key: 'issue_date', type: 'date', sm: 6, show: false, value: '' ,filter: (val) => parseTime(val, '{y}-{m}-{d}')},
   { label: '合约:', key: 'contract', type: 'string', sm: 16, show: false, value: '' }
 
@@ -223,7 +224,7 @@ export default {
   created() {
     this.init()
   },
-  methods: {
+  methods: { 
     init() {
       getDetails({
         id: this.$route.params.id
@@ -282,6 +283,10 @@ export default {
           const { lang } = this.languageTypeOptions[0]
           this.langChange(lang)
         })
+
+      // getChainList().then(res => {
+      //   console.log({res})
+      // })
     },
     async langChange(val) {
       const langData = this.languageTypeOptions.find(v => v.lang == val)

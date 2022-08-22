@@ -123,14 +123,16 @@ import ContainerHeader from '@/components/ContainerHeader'
 import { getDetails, verify, update, getMultiLanguageList } from '@/api/dapp'
 import { parseTime, UpperCase } from '@/utils'
 import { BigNumber } from 'bignumber.js'
+import {getChainName, getChainListName} from '@/utils/chain-help'
 const languageTypeOptions = []
 
 const IconColumus = [
   { label: 'DApp 名称:', key: 'name', type: 'string', show: false, value: '' },
-  { label: '主链:', key: 'chains', type: 'string', show: false, value: '', filter: UpperCase },
+  { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: getChainName },
+  { label: '主链标签:', key: 'chains', type: 'string', show: false, value: '', filter: getChainListName },
   { label: 'Tags', key: 'tags', type: 'string', show: false, value: '' },
   // { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
-  { label: '关键字', key: 'keywords', type: 'string', show: false, value: '' },
+  // { label: '关键字', key: 'keywords', type: 'string', show: false, value: '' },
   // { label: '合约', key: 'contract_setting', type: 'string', show: false, value: '' },
   { label: 'URL', key: 'url', type: 'string', show: false, value: '' },
   // { label: '官网', key: 'website', type: 'string', show: false, value: '' },

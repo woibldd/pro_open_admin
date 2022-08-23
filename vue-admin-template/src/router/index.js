@@ -86,14 +86,14 @@ export const TokenApproval = [
     path: 'token/list',
     name: 'Token',
     component: () => import('@/views/approval/token/list'),
-    meta: { title: 'token审核列表', icon: 'table' }
+    meta: { title: 'Token审核列表', icon: 'table' }
   },
   {
     path: 'token/detail/:id',
     name: 'tokenDetail',
     hidden: true,
     component: () => import('@/views/approval/token/detail'),
-    meta: { title: 'token详情', icon: 'table' }
+    meta: { title: 'Token详情', icon: 'table' }
   }
 ]
 
@@ -118,14 +118,14 @@ export const DAppApproval = [
     path: 'DAPP/list',
     name: 'DAPP',
     component: () => import('@/views/approval/dapp/list'),
-    meta: { title: 'DAPP审核列表', icon: 'table' }
+    meta: { title: 'DApp审核列表', icon: 'table' }
   },
   {
     path: 'DAPP/detail/:id',
     name: 'DAPPDetail',
     hidden: true,
     component: () => import('@/views/approval/dapp/detail'),
-    meta: { title: 'DAPP详情', icon: 'table' }
+    meta: { title: 'DApp详情', icon: 'table' }
   }
 ]
 
@@ -247,7 +247,7 @@ export const asyncRoutes = [
     redirect: '/approval/token/list',
     name: 'Approval',
     meta: { title: '审核列表', icon: 'el-icon-s-help' },
-    children: [...TokenApproval, ...NFTApproval,...DAppApproval]
+    children: [...TokenApproval,...DAppApproval]
   },
   {
     path: '/userManagemen',

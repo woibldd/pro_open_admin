@@ -4,7 +4,7 @@
     <div class="filter-container">
       <el-form :inline="true">
         <el-form-item label="关键字搜索">
-          <el-input v-model="listQuery.search_key"  clearable placeholder="token 合约 主链" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+          <el-input v-model="listQuery.search_key"  clearable placeholder="DApp名称 主链" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
         </el-form-item>
         <el-form-item label="审核状态">
           <el-select v-model="listQuery.status" placeholder="审核状态"  clearable class="filter-item" style="width: 130px">
@@ -13,8 +13,8 @@
         </el-form-item>
 
         <!-- <el-select v-model="listQuery.sort" style="width: 140px" class="filter-item" @change="handleFilter">
-        <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
-      </el-select> -->
+          <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" />
+        </el-select> -->
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
           搜索
         </el-button>
@@ -25,7 +25,7 @@
       </el-form>
     </div>
 
-    <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @sort-change="sortChange" @row-click="handleRowClick">
+    <el-table :key="tableKey" v-loading="listLoading"  :data="list" border fit highlight-current-row style="width: 100%;" @sort-change="sortChange" @row-click="handleRowClick">
       <el-table-column label="ID" fixed="left" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
         <template slot-scope="{ row }">
           <span>{{ row.id }}</span>
@@ -36,22 +36,27 @@
           <el-image style="width: 40px; height: 40px; border-radius:50%" :src="row.icon" fit="contain"></el-image>
         </template>
       </el-table-column>
-      <el-table-column label="币名(symbol)" fixed="left" align="center">
+      <el-table-column label="DApp名称" fixed="left" width="110px" align="center">
         <template slot-scope="{ row }">
-          {{ row.coin }}
+          <span>{{ row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="主链(chain)" fixed="left" width="110px" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.chain }}</span>
+          <span>{{ row.chains }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Tags" fixed="left" align="center">
+        <template slot-scope="{ row }">
+          {{ row.tags }}
         </template>
       </el-table-column>
 
-      <el-table-column label="合约地址(contract)" align="center" show-overflow-tooltip>
+      <!-- <el-table-column label="合约地址(contract)" align="center" show-overflow-tooltip>
         <template slot-scope="{ row }">
           <span @click.stop="handleCopy(row.contract, $event)" class="pointer" title="copy">{{ row.contract || '--' }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="提交用户(eth_address)" align="center" show-overflow-tooltip>
         <template slot-scope="{ row }">
           <span @click.stop="handleCopy(row.owner_eth_address, $event)" class="pointer" title="copy">{{ row.owner_eth_address || '--' }}</span>
@@ -80,13 +85,13 @@
 
       <el-table-column label="操作" fixed="right" align="center" min-width="100" class-name="small-padding fixed-width">
         <template slot-scope="{ row }">
-          <el-button v-if="row.status == 0" type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
+          <el-button v-if="row.status == 0"  type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
             审核通过
           </el-button>
-          <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
+          <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleReject(row, 'refuse')">
             拒绝
           </el-button>
-          <el-button size="mini" @click.stop="$router.push(`/approval/token/detail/${row.id}`)">
+          <el-button size="mini" @click.stop="$router.push(`/approval/dapp/detail/${row.id}`)">
             查看
           </el-button>
         </template>
@@ -94,7 +99,7 @@
     </el-table>
 
     <div style="height:100px"></div>
-    <!-- <ContainerFooter> -->
+    <!-- <ContainerFooter> --> 
     <pagination v-show="total > 0" class="footer-pagination" align="right" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
     <!-- </ContainerFooter> -->
 
@@ -104,41 +109,29 @@
           <el-image style="width: 40px; height: 40px;border-radius:50%" :src="appovalFormData.data.icon" fit="contain"></el-image>
         </el-form-item>
 
-        <el-form-item label="币名：">
+        <!-- <el-form-item label="币名：">
           <span>{{ appovalFormData.data.coin }} </span>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="主链：">
-          <span>{{ appovalFormData.data.chain }}</span>
+          <span>{{ getChainName(appovalFormData.data.chain)  }} </span>
         </el-form-item>
-        <el-form-item label="合约地址：">
-          <span>{{ appovalFormData.data.contract }}</span>
+        <el-form-item label="主链标签：">
+          <span>{{ getChainListName(appovalFormData.data.chains)  }} </span>
         </el-form-item>
-        <el-form-item label="价格来源：">
-          <el-select v-model="appovalFormData.data.price_from" placeholder="价格来源（auto）" class="filter-item">
-            <el-option v-for="item in price_from_list" :key="item.key" :value="item.key">
-              <span style="float: left">{{ item.key }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">${{ item.value }}</span>
-            </el-option>
-          </el-select>
+        <el-form-item label="Tags：">
+          <span>{{ appovalFormData.data.tags }}</span>
         </el-form-item>
-        <el-form-item label="当前币价：">
-          <span style="padding-left:5px; color: #8492a6; font-size: 20px">${{ icon_price }}</span>
-        </el-form-item>
-
         <!-- 多语言 -->
-        <el-form-item label="全名：">
+        <el-form-item label="DApp名称：">
           <span>{{ appovalFormData.data.name }}</span>
         </el-form-item>
-        <el-form-item label="货币介绍：">
-          <span>{{ appovalFormData.data.about }}</span>
-        </el-form-item>
+        <el-form-item label="DApp介绍：">
+          <span>{{ appovalFormData.data.introduction }}</span>
+        </el-form-item> 
+        <el-form-item label="URL：">
+          <span>{{ appovalFormData.data.url }}</span>
+        </el-form-item> 
 
-        <el-form-item label="发行总量：">
-          <span>{{ appovalFormData.data.supply_total }}</span>
-        </el-form-item>
-        <!-- <el-form-item label="总市值">
-          <span>{{ appovalFormData.data.contract }}</span>
-        </el-form-item> -->
         <el-form-item v-if="appovalFormData.type != 'approval'" prop="remark" label="拒绝原因" :rules="[{ required: true, message: '请填写拒绝原因' }]" style="max-width:100%">
           <el-input style="max-width:100%" v-model="appovalFormData.remark" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="请填写拒绝原因" />
         </el-form-item>
@@ -164,6 +157,7 @@ import ContainerHeader from '@/components/ContainerHeader'
 import ContainerFooter from '@/components/ContainerFooter'
 import clip from '@/utils/clipboard'
 import { BigNumber } from "bignumber.js";
+import {getChainName, getChainListName} from '@/utils/chain-help'
 const calendarTypeOptions = [
   { key: 0, display_name: '审核中', tagtype: 'warn' },
   { key: 1, display_name: '审核通过', tagtype: 'success' },
@@ -212,7 +206,8 @@ export default {
         importance: undefined,
         search_key: undefined,
         status: undefined,
-        sort: '+id'
+        sort: 'update_time',
+        sortby: 'DESC'
       },
       calendarTypeOptions,
       sortOptions: [
@@ -258,6 +253,8 @@ export default {
     this.getList()
   },
   methods: {
+    getChainName,
+    getChainListName,
     getList(noLoading) {
       if (!noLoading) {
         this.listLoading = true
@@ -280,7 +277,7 @@ export default {
       clip(text, event)
     },
     handleRowClick({ id }) {
-      this.$router.push(`/approval/token/detail/${id}`)
+      // this.$router.push(`/approval/dapp/detail/${id}`)
     },
     sortChange(data) {
       const { prop, order } = data
@@ -288,16 +285,43 @@ export default {
         this.sortByID(order)
       }
     },
-    sortByID(order) {
+    sortByID(order) { 
       if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+        this.listQuery.sort = 'id'
+        this.listQuery.sortby = 'ASC'
+      } else if (order === 'descending') {
+        this.listQuery.sort = 'id'
+        this.listQuery.sortby = 'DESC'
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = 'update_time'
+        this.listQuery.sortby = 'DESC'
       }
       this.handleFilter()
     },
     // symbol', 'currency', 'chain', 'contract'
     async handleApproval(row, type) {
+      
+      const r = await this.$confirm('确认通过后将在页面中显示改DApp，确认审核通过？')
+      if (r !== 'confirm') return 
+       
+      verify({ id: row.id, status: 1, remark:'' })
+        .then(res => {
+          this.handleFilter()
+          this.$notify({
+            title: '提示',
+            message: '提交成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.submitLoading = false
+          this.dialogFormVisible = false
+        })
+        .catch(err => {
+          this.submitLoading = false
+          this.getList(true)
+        })
+    },
+    async handleReject(row, type) {
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -307,8 +331,8 @@ export default {
       this.appovalFormData.type = type
       this.appovalFormData.row = row
       this.appovalFormData.data = JSON.parse(JSON.stringify(row))
-      this.appovalFormData.remark = ''
-      this.getPrice()
+      this.appovalFormData.remark = '' 
+
     },
     async getPrice(){
      const { data, status } =  await getPrice({
@@ -376,8 +400,9 @@ export default {
       )
     },
     getSortClass: function(key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}` ? 'ascending' : 'descending'
+      // const sortby = this.listQuery.sortby
+      // return sortby === `ASC` ? 'ascending' : 'descending'
+      return ''
     }
   }
 }

@@ -30,7 +30,7 @@ export function  getDetails(params = {
     method: 'get',
     params
   })
-}
+} 
 
 export function update(data = {}) {
   return request({
@@ -46,3 +46,21 @@ export function verify(data = {}) {
     data
   })
 }
+
+
+export function getMultiLanguageList( params) {
+  return request({
+    url: '/token/getMultiLanguageList',
+    method: 'get',
+    params
+  })
+}
+
+// export function getChainList(params) {
+//   return request({
+//     url: '/token/getChainList',
+//     method: 'get',
+//     params
+//   })
+// }
+

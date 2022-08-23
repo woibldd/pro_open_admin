@@ -6,8 +6,8 @@
       "node_args": "--inspect=0.0.0.0:8856",
       "watch": true,
       "log_date_format": "YYYY-MM-DD HH:mm:ss",
-      "error_file": "/data/caoshiyuan/logs/pro_open_admin/api_error.log",
-      "out_file":  "/data/caoshiyuan/logs/pro_open_admin/api_runtime.log"
+      "error_file": "./log/api_error.log",
+      "out_file":  "./log/api_runtime.log"
     }
   ]
 }

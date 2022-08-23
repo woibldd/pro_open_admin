@@ -53,11 +53,12 @@ module.exports = class NFTController extends CoreController {
         delete nft.owner_eth_address;
         delete nft.search_key;
 
-        nft.multiLanguageList = await LanguageHelper.batchGet('NFT', [ { id } ]);
+        // nft.multiLanguageList = await LanguageHelper.batchGet('NFT', [ { id } ]);
         return nft;
     }
 
     async verify (params) {
+
         this._checkParams(params, ['sessionId', 'id', 'status']);
         const { id, status, remark, sessionId } = params;
 

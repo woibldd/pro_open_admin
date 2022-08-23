@@ -6,8 +6,8 @@
         <el-avatar class="icon" shape="circle" :size="50" fit="fit" :src="dataInfo.icon" alt="alt"></el-avatar>
         <h1 class="symbol">{{ dataInfo.coin }}</h1>
         <div class="name">{{ dataInfo.name }}</div>
-        <el-tag class="chain" size="small" type="info" style="margin-right:5px">{{ dataInfo.chain | UpperCase }}链</el-tag>
-        <el-tag size="small" type="info" v-if="dataInfo.contract || dataInfo.contract.length == 2">代币</el-tag>
+        <!-- <el-tag class="chain" size="small" type="info" style="margin-right:5px">{{ dataInfo.chains | UpperCase }} 链</el-tag> -->
+        <!-- <el-tag size="small" type="info" v-if="dataInfo.contract || dataInfo.contract.length == 2">代币</el-tag> -->
         <el-select v-model="lang" placeholder="语言展示" class="lang" @change="langChange">
           <el-option v-for="item in languageTypeOptions" :key="item.lang" :label="item.lang" :value="item.lang" />
         </el-select>
@@ -25,7 +25,7 @@
         <el-divider class="title">基本信息</el-divider>
         <!-- <h3 class="title">基本信息</h3> -->
         <el-row :gutter="10" class="content">
-          <el-col :xs="col.xs || 24" :sm="col.sm || 6" v-for="col in IconColumus" :key="col.key">
+          <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in IconColumus" :key="col.key">
             <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
               <el-link :href="dataInfo[col.key] || col.value" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key] || col.value) : dataInfo[col.key] || col.value }}</el-link>
             </el-form-item>
@@ -38,7 +38,7 @@
           </el-col>
         </el-row>
 
-        <el-divider class="title">token介绍</el-divider>
+        <!-- <el-divider class="title">token介绍</el-divider>
 
         <el-row :gutter="10" class="content">
           <el-col :xs="col.xs || 24" :sm="col.sm || 6" :offset="col.offset || 0" v-for="col in OtherColumus" :key="col.key" :style="col.style || {}">
@@ -49,32 +49,12 @@
               {{ dataInfo[col.key] || col.value }}
             </el-form-item>
           </el-col>
-        </el-row>
-
-        <el-divider class="title" v-if="Tools.length > 0">tools工具</el-divider>
-
-        <el-row :gutter="10" class="content" v-for="row in Tools" :key="row.id">
-          <el-col :xs="24" :sm="8">
-            <el-form-item label="工具名称">
-              {{ row.toolname || '--' }}
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="8">
-            <el-form-item label="图标链接">
-              <el-avatar :title="row.icon" shape="circle" :size="30" fit="fit" :src="row.icon" alt="alt"></el-avatar>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="8">
-            <el-form-item label="URL">
-              <el-link v-if="row.url" :href="row.url" target="_blank"> {{ row.url }}</el-link>
-              <span v-else>--</span>
-            </el-form-item>
-          </el-col>
-        </el-row>
+        </el-row> -->
+        
 
         <el-divider class="title">其他信息</el-divider>
         <el-row :gutter="10" class="content">
-          <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in Other1Columus" :key="col.key">
+          <el-col class="my-col" :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in Other1Columus" :key="col.key">
             <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
               <el-link v-if="dataInfo[col.key]" :href="col.value" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key]) : dataInfo[col.key] }}</el-link>
               <span v-else>--</span>
@@ -85,7 +65,20 @@
           </el-col>
         </el-row>
 
-        <el-divider class="title">可修改信息</el-divider>
+        <el-divider class="title">多语言</el-divider>
+        <el-row :gutter="10" class="content">
+          <el-col class="my-col" :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in langDataColumus" :key="col.key">
+            <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
+              <el-link v-if="langData[col.key]" :href="langData[col.key]" target="_blank">{{ col.filter ? col.filter(langData[col.key]) : langData[col.key] }}</el-link>
+              <span v-else>--</span>
+            </el-form-item>
+            <el-form-item v-else :label="col.label || col.key">
+              {{ langData[col.key] || col.value || '--' }}
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- <el-divider class="title">可修改信息</el-divider>
 
         <el-form-item label="币价来源：">
           <el-select v-model="dataInfo.price_from" :disabled="dataInfo.status != 0" placeholder="价格来源（auto）" class="filter-item" @change="price_from_change">
@@ -94,7 +87,7 @@
               <span style="float: right; color: #8492a6; font-size: 13px">${{ item.value }}</span>
             </el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
       </div>
     </el-form>
 
@@ -127,37 +120,49 @@
 
 <script>
 import ContainerHeader from '@/components/ContainerHeader'
-import { getDetails, verify, getPrice, update } from '@/api/token'
+import { getDetails, verify, update, getMultiLanguageList } from '@/api/dapp'
 import { parseTime, UpperCase } from '@/utils'
 import { BigNumber } from 'bignumber.js'
-const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
+import {getChainName, getChainListName} from '@/utils/chain-help'
+const languageTypeOptions = []
 
 const IconColumus = [
-  { label: 'Token 名称:', key: 'name', type: 'string', show: false, value: '' },
-  { label: '币名(标识):', key: 'coin', type: 'string', show: false, value: '' },
-  { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
-  { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: UpperCase },
-  { label: '合约:', key: 'contract', type: 'string', sm: 24, show: false, value: '' }
-
+  { label: 'DApp 名称:', key: 'name', type: 'string', show: false, value: '' },
+  { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: getChainName },
+  { label: '主链标签:', key: 'chains', type: 'string', show: false, value: '', filter: getChainListName },
+  { label: 'Tags', key: 'tags', type: 'string', show: false, value: '' },
+  // { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
+  // { label: '关键字', key: 'keywords', type: 'string', show: false, value: '' },
+  // { label: '合约', key: 'contract_setting', type: 'string', show: false, value: '' },
+  { label: 'URL', key: 'url', type: 'string', show: false, value: '' },
+  // { label: '官网', key: 'website', type: 'string', show: false, value: '' },
+  { label: '简介', key: 'introduction', type: 'string', show: false, value: '' },
+  // { label: '合约:', key: 'contract', type: 'string', sm: 24, show: false, value: '' } 
   // { label: '浏览器（账户）', key: 'coin', type: 'string', show: false, value: '' },
 ]
 
-const OtherColumus = [
-  { label: '总供应量:', key: 'supply_total', type: 'string', show: false, value: '--' },
-  { label: '精度:', key: 'decimals', type: 'string', show: false, value: '--' },
-  // { label: '币价:', key: 'price', type: 'string', show: false, value: '--' },
-  { label: '币价来源:', key: 'price_from', type: 'string', show: false, value: '--' },
-
-  { label: '货币介绍:', key: 'about', sm: 20, type: 'string', show: false, value: '--' }
+const OtherColumus = [ 
 ]
 
 const Other1Columus = [
   { label: '白皮书:', key: 'whitepaper', type: 'href', show: false, value: '' },
   { label: 'Twitter:', key: 'twitter', type: 'href', show: false, value: '' },
-  { label: '官网:', key: 'website', type: 'href', show: false, value: '' },
+  { label: 'Discord:', key: 'discord', type: 'href', show: false, value: '' },
   { label: 'GitHub:', key: 'github', type: 'href', show: false, value: '' },
   { label: 'Telegram:', key: 'telegram', type: 'href', show: false, value: '' },
-  { label: 'Facebook:', key: 'facebook', type: 'href', show: false, value: '' }
+  { label: 'Facebook:', key: 'facebook', type: 'href', show: false, value: '' },
+  { label: '邮箱:', key: 'email', type: 'string', show: false, value: '' },
+  { label: '社区信息:', key: 'community_info', type: 'string', show: false, value: '' },
+  { label: 'recommender:', key: 'recommender', type: 'string', show: false, value: '' }
+]
+
+const langDataColumus = [
+  { label: '名称:', key: 'name', type: 'string', show: false, value: '' },
+  { label: 'URL:', key: 'url', type: 'href', show: false, value: '' },
+  { label: '介绍:', key: 'intro', type: 'string', show: false, value: '' },
+  { label: '描述:', key: 'description', type: 'string', show: false, value: '' },
+  { label: '相关教程标题:', key: 'relationDocTitle', type: 'string', show: false, value: '' },
+  { label: '相关教程URL:', key: 'relationDocURL', type: 'href', show: false, value: '' },
 ]
 
 const calendarTypeOptions = [
@@ -173,6 +178,7 @@ export default {
       languageTypeOptions,
       price_from_list: [],
       lang: 'en',
+      langData: {},
       oDataInfo: {},
       dataInfo: {
         multiLanguageList: [],
@@ -188,6 +194,7 @@ export default {
       IconColumus,
       OtherColumus,
       Other1Columus,
+      langDataColumus,
       Tools: []
     }
   },
@@ -227,70 +234,41 @@ export default {
           const data = res.data
           this.oDataInfo = data
           this.dataInfo = Object.assign(this.dataInfo, data)
-
-          this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length > 0 ? data.multiLanguageList : [{ id: '', lang: 'en', data }]
-          const { lang } = this.languageTypeOptions[0]
-          this.langChange(lang)
-          this.getPrice()
-          clearInterval(this.timer)
-          this.timer = setInterval(() => {
-            this.getPrice()
-          }, 5000)
-
-          // this.IconColumus = this.IconColumus.map(v => {
-          //   if (data[v.key]) {
-          //     v.show = true
-          //     v.value = data[v.key]
-          //   }
-          //   return v
-          // })
-          // this.OtherColumus = this.OtherColumus.map(v => {
-          //   if (data[v.key]) {
-          //     v.show = true
-          //     v.value = data[v.key]
-          //   }
-          //   return v
-          // })
-          //  this.Other1Columus = this.Other1Columus.map(v => {
-          //   if (data[v.key]) {
-          //     v.show = true
-          //     v.value = data[v.key]
-          //   }
-          //   return v
-          // })
-          // this.tools = this.tools.map(v => {
-          //   if (data[v.key]) {
-          //     v.show = true
-          //     v.value = data[v.key]
-          //   }
-          //   return v
-          // })
+ 
+           this.Other1Columus = this.Other1Columus.map(v => {
+            if (data[v.key]) {
+              v.show = true
+              v.value = data[v.key]
+            }
+            return v
+          }) 
         })
         .catch(err => console.error(err))
+
+     
+      getMultiLanguageList({id: this.$route.params.id})
+        .then(res => {
+          if (!res.data) return 
+          this.languageTypeOptions = res.data  
+          this.dataInfo.multiLanguageList = res.data   
+          this.langChange('en')
+        })
     },
     async langChange(val) {
       const langData = this.languageTypeOptions.find(v => v.lang == val)
-      Object.assign(this.dataInfo, { abort: '', name: '', whitepaper: '', tools: [] }, (langData && langData.data) || {})
+      // Object.assign(this.dataInfo, { abort: '', name: '', whitepaper: '', tools: [] }, (langData && langData.data) || {})
+      this.langData = langData.data
+      console.log('langChange', this.langData, val)
 
-      this.Tools = this.dataInfo.tools || []
+      // this.Tools = this.dataInfo.tools || []
     },
     async price_from_change(val) {
       console.log({ val })
     },
-    async getPrice() {
-      const { data, status } = await getPrice({
-        currency: 'usdt',
-        symbol: this.dataInfo.coin,
-        chain: this.dataInfo.chain,
-        contract: this.dataInfo.contract
-      }).catch(err => ({ status: 5000 }))
-      if (status == 0) {
-        this.price_from_list = Object.entries(data).map(([key, value]) => ({ key: key == 'all' ? 'auto' : key, value }))
-      }
-    },
+     
     async submitApproval(type) {
       if (type == 1) {
-        const r = await this.$confirm('确认通过后将在页面中显示改币种，确认审核通过？')
+        const r = await this.$confirm('确认通过后将在页面中显示改DApp，确认审核通过？')
         if (r !== 'confirm') return
       } else {
         await this.$refs['dataForm'].validate()
@@ -376,11 +354,34 @@ export default {
         .el-form-item__content {
           overflow: hidden;
         }
+        .my-col {
+          min-height: 42px;
+          height: 80px;
+        }
       }
     }
   }
   .footer {
     text-align: center;
+  }
+}
+</style>
+
+<style lang="scss">
+.info {
+  .content { 
+    .el-form-item__content {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; 
+      .el-link--inner {
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; 
+      }
+    }
   }
 }
 </style>

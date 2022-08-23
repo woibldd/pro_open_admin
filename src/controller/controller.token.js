@@ -16,16 +16,17 @@ module.exports = class TokenController extends CoreController {
 
     async list (params) {
         this._checkParams(params, ['pageNum', 'pageSize']);
-        const { pageNum, pageSize, status, search_key } = params;
+        const { pageNum, pageSize, status, search_key, sort, sortby } = params;
 
         const offset = (pageNum - 1) * pageSize;
         let where = `WHERE 1=1`;
         if(search_key){
-            where += ` AND search_key like  '%${search_key}%' OR name like '%${search_key}%'`;
+            where += ` AND chain like  '%${search_key}%' OR name like '%${search_key}%' OR coin like '%${search_key}%' OR contract like '%${search_key}%' `;
         }
         if (status) {
             where += ` AND status=${status} `;
         }
+        let orderby = `ORDER BY ${sort} ${sortby}`
        
 
      
@@ -33,7 +34,7 @@ module.exports = class TokenController extends CoreController {
 
         const totalCount = await DBhelper.queryMysql(MYSQL_OPEN, `SELECT count(*) as count FROM Token ${where}`);
         const result = await DBhelper.queryMysql(MYSQL_OPEN, {
-            sql: `SELECT * FROM Token ${where} ORDER BY create_time DESC LIMIT ?,?`,
+            sql: `SELECT * FROM Token ${where} ${orderby} LIMIT ?,?`,
             values: [parseInt(offset), parseInt(pageSize)]
         });
 
@@ -56,8 +57,17 @@ module.exports = class TokenController extends CoreController {
         delete token.owner_eth_address;
         delete token.search_key;
 
-        token.multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
+        // token.multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
         return token;
+    } 
+
+    async getMultiLanguageList(params) {
+        const { id } = params; 
+        return await LanguageHelper.batchGet('Token', [ { id } ]);
+    }
+
+    async getChainList() {
+        return await Coinhelper.getChainlist()
     }
 
     /**
@@ -97,7 +107,7 @@ module.exports = class TokenController extends CoreController {
                 values: [ status, remark || '', id ]
             });
             return true;
-        }
+        } 
         
         // 审核通过
         // 判断线上是否存在
@@ -105,8 +115,10 @@ module.exports = class TokenController extends CoreController {
             start: 0,
             limit: 1,
             chain: token.chain,
-            contract: token.contract
+            contracts: [token.contract]
         };
+
+        //"host_coin": "http://ms.coin:8876",
         const coins = await NetHelper.post({
             url: `${CONFIG.host_coin}/admin/coinList`,
             json: true,
@@ -117,8 +129,23 @@ module.exports = class TokenController extends CoreController {
         // token是否已经上线
         if (coins && coins.list && coins.list.length > 0) {
             coin = coins.list[0];
-            if (coin.owner_eth_address !== token.owner_eth_address || id !== coin.open_id) throw new Error('线上已存在该Token, 请重新确认');
+            if (coin.owner_eth_address !== token.owner_eth_address || id !== coin.open_id) 
+            throw new Error('线上已存在该Token, 请重新确认');
+            // throw new Error(`coin.address:${coin.owner_eth_address}, coin.id:${coin.open_id}, token.address:${token.owner_eth_address}, token:id${id}， ${coins.list.length}`);
+            // throw new Error(JSON.stringify(result))
         }
+
+
+        let multiLanguageListnew = await LanguageHelper.batchGet('Token', [ { id } ]);
+        multiLanguageListnew = multiLanguageListnew.map(_ => {
+                const data = _.data;
+                data.browserAccount = '';
+                data.browserTx = '';
+                data.browserQuote = ''; 
+                _.data = data;
+                return _;
+            })
+        // throw new Error('Token not multiLanguageListnew');
 
         // 同步上线
         const data = Object.assign(token, {
@@ -130,10 +157,16 @@ module.exports = class TokenController extends CoreController {
             browserQuote: token.browser_quote || '',
             version: token.version || 0,
             sort: token.sort || 0,
+            issue_data: token.issue_date || '',
+            email:  token.email || '',
+            community_info: token.community_info ||  '',
+            recommender: token.recommender ||  '',
+            langList: multiLanguageListnew || [],
             open_id: id,
-            status: 1,                                       // ms_coin状态，上线
+            status: 0,                                       // ms_coin状态，上线
         });
         delete data.id;
+
 
         // 线上存在该coin且归属于当前开放平台用户，则更新；否则，新增
         if (coin) data.id = coin.id;
@@ -141,7 +174,7 @@ module.exports = class TokenController extends CoreController {
             url: `${CONFIG.host_coin}/admin/openSyncCoin`,
             json: true,
             body: data
-        });
+        }); 
 
         let updatedCoin = null;
         if (updatedCoins && updatedCoins.length > 0) {
@@ -151,32 +184,32 @@ module.exports = class TokenController extends CoreController {
                 // coin新增后更新coin_id
                 await DBhelper.queryMysql(MYSQL_OPEN, {
                     sql: `UPDATE Token SET coin_id=?, status=?, remark=?, is_online=? WHERE id=?`,
-                    values: [ updatedCoin.id, status, remark || '', updatedCoin.status || 1, id ]
+                    values: [ updatedCoin.id, status, remark || '', updatedCoin.status || 0, id ]
                 });
             } else {
                 // coin更新后
                 await DBhelper.queryMysql(MYSQL_OPEN, {
                     sql: `UPDATE Token SET status=?, remark=?, is_online=? WHERE id=? `,
-                    values: [ status, remark || '', updatedCoin.status || 1, id ]
-                });
+                    values: [ status, remark || '', updatedCoin.status || 0, id ]
+                }); 
             }
         }
 
-        // 多语言同步
-        const multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
-        if (!multiLanguageList || multiLanguageList.length == 0) return true;
+        // // 多语言同步
+        // const multiLanguageList = await LanguageHelper.batchGet('Token', [ { id } ]);
+        // if (!multiLanguageList || multiLanguageList.length == 0) return true;
 
-        await LanguageHelper.batchSet('coin', 'Coins', multiLanguageList.map(_ => {
-            const data = _.data;
-            data.browserAccount = data.browser_account;
-            data.browserTx = data.browser_tx;
-            data.browserQuote = data.browser_quote;
-            delete data.browser_account;
-            delete data.browser_tx;
-            delete data.browser_quote;
-            _.data = data;
-            return _;
-        }));
+        // await LanguageHelper.batchSet('coin', 'Coins', multiLanguageList.map(_ => {
+        //     const data = _.data;
+        //     data.browserAccount = data.browser_account;
+        //     data.browserTx = data.browser_tx;
+        //     data.browserQuote = data.browser_quote;
+        //     delete data.browser_account;
+        //     delete data.browser_tx;
+        //     delete data.browser_quote;
+        //     _.data = data;
+        //     return _;
+        // })); 
         
         return true;
     }

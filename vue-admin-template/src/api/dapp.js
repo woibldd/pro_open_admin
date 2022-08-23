@@ -38,3 +38,11 @@ export function verify(data = {}) {
     data
   })
 }
+
+export function getMultiLanguageList(params = {}) {
+  return request({
+    url: '/dapp/getMultiLanguageList',
+    method: 'get',
+    params
+  })
+}

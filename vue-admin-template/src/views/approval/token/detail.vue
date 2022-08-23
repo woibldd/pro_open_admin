@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container tokenDetails">
+  <div class="app-container tokenDetails"> 
     <!-- <ContainerHeader :title="$route.meta.title" /> -->
     <div class="header">
       <div class="icon-info">
@@ -56,12 +56,13 @@
         <el-row :gutter="10" class="content" v-for="row in Tools" :key="row.id">
           <el-col :xs="24" :sm="8">
             <el-form-item label="工具名称">
-              {{ row.toolname || '--' }}
+              {{ row.title || '--' }}
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="8">
             <el-form-item label="图标链接">
-              <el-avatar :title="row.icon" shape="circle" :size="30" fit="fit" :src="row.icon" alt="alt"></el-avatar>
+              <!-- <el-avatar :title="row.icon" shape="circle" :size="30" fit="fit" @error="()=>row.error=true" v-show="!row.error"  :src="row.icon" alt="alt"></el-avatar> -->
+              <a :href="row.icon">{{row.icon}}</a>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="8">
@@ -76,7 +77,7 @@
         <el-row :gutter="10" class="content">
           <el-col :xs="col.xs || 24" :sm="col.sm || 8" v-for="col in Other1Columus" :key="col.key">
             <el-form-item v-if="col.type == 'href'" :label="col.label || col.key">
-              <el-link v-if="dataInfo[col.key]" :href="col.value" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key]) : dataInfo[col.key] }}</el-link>
+              <el-link v-if="dataInfo[col.key]" :href="dataInfo[col.key]" target="_blank">{{ col.filter ? col.filter(dataInfo[col.key]) : dataInfo[col.key] }}</el-link>
               <span v-else>--</span>
             </el-form-item>
             <el-form-item v-else :label="col.label || col.key">
@@ -127,8 +128,9 @@
 
 <script>
 import ContainerHeader from '@/components/ContainerHeader'
-import { getDetails, verify, getPrice, update } from '@/api/token'
+import { getDetails, verify, getPrice, update, getMultiLanguageList } from '@/api/token'
 import { parseTime, UpperCase } from '@/utils'
+import {getChainName} from '@/utils/chain-help'
 import { BigNumber } from 'bignumber.js'
 const languageTypeOptions = [{ id: 'en', lang: 'en', tagtype: 'warn' }]
 
@@ -136,8 +138,9 @@ const IconColumus = [
   { label: 'Token 名称:', key: 'name', type: 'string', show: false, value: '' },
   { label: '币名(标识):', key: 'coin', type: 'string', show: false, value: '' },
   { label: '图标:', key: 'icon', type: 'image', show: false, value: '' },
-  { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: UpperCase },
-  { label: '合约:', key: 'contract', type: 'string', sm: 24, show: false, value: '' }
+  { label: '主链:', key: 'chain', type: 'string', show: false, value: '', filter: getChainName },
+  { label: '发布日期:', key: 'issue_date', type: 'date', sm: 6, show: false, value: '' ,filter: (val) => parseTime(val, '{y}-{m}-{d}')},
+  { label: '合约:', key: 'contract', type: 'string', sm: 16, show: false, value: '' }
 
   // { label: '浏览器（账户）', key: 'coin', type: 'string', show: false, value: '' },
 ]
@@ -157,7 +160,10 @@ const Other1Columus = [
   { label: '官网:', key: 'website', type: 'href', show: false, value: '' },
   { label: 'GitHub:', key: 'github', type: 'href', show: false, value: '' },
   { label: 'Telegram:', key: 'telegram', type: 'href', show: false, value: '' },
-  { label: 'Facebook:', key: 'facebook', type: 'href', show: false, value: '' }
+  { label: 'Facebook:', key: 'facebook', type: 'href', show: false, value: '' },
+  { label: 'email:', key: 'email', type: 'string', show: false, value: '' },
+  { label: '社区信息:', key: 'community_info', type: 'string', show: false, value: '' },
+  { label: '推荐人:', key: 'recommender', type: 'string', show: false, value: '' }
 ]
 
 const calendarTypeOptions = [
@@ -188,7 +194,8 @@ export default {
       IconColumus,
       OtherColumus,
       Other1Columus,
-      Tools: []
+      Tools: [],
+      multiLanguageList: []
     }
   },
   computed: {
@@ -217,7 +224,7 @@ export default {
   created() {
     this.init()
   },
-  methods: {
+  methods: { 
     init() {
       getDetails({
         id: this.$route.params.id
@@ -228,9 +235,9 @@ export default {
           this.oDataInfo = data
           this.dataInfo = Object.assign(this.dataInfo, data)
 
-          this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length > 0 ? data.multiLanguageList : [{ id: '', lang: 'en', data }]
-          const { lang } = this.languageTypeOptions[0]
-          this.langChange(lang)
+          // this.languageTypeOptions = data.multiLanguageList && data.multiLanguageList.length > 0 ? data.multiLanguageList : [{ id: '', lang: 'en', data }]
+          // const { lang } = this.languageTypeOptions[0]
+          // this.langChange(lang)
           this.getPrice()
           clearInterval(this.timer)
           this.timer = setInterval(() => {
@@ -267,12 +274,25 @@ export default {
           // })
         })
         .catch(err => console.error(err))
+
+      getMultiLanguageList({id: this.$route.params.id})
+        .then(res => {
+          if (!res.data) return
+          // console.log(res.data)
+          this.languageTypeOptions = res.data  
+          const { lang } = this.languageTypeOptions[0]
+          this.langChange(lang)
+        })
+
+      // getChainList().then(res => {
+      //   console.log({res})
+      // })
     },
     async langChange(val) {
       const langData = this.languageTypeOptions.find(v => v.lang == val)
       Object.assign(this.dataInfo, { abort: '', name: '', whitepaper: '', tools: [] }, (langData && langData.data) || {})
-
-      this.Tools = this.dataInfo.tools || []
+      // console.log({langData} , this.dataInfo)
+      this.Tools =  this.dataInfo.tools || []
     },
     async price_from_change(val) {
       console.log({ val })
@@ -290,7 +310,7 @@ export default {
     },
     async submitApproval(type) {
       if (type == 1) {
-        const r = await this.$confirm('确认通过后将在页面中显示改币种，确认审核通过？')
+        const r = await this.$confirm('确认通过后将在页面中显示该币种，确认审核通过？')
         if (r !== 'confirm') return
       } else {
         await this.$refs['dataForm'].validate()
@@ -337,6 +357,7 @@ export default {
   padding: 40px;
   .el-form-item {
     margin-bottom: 0px;
+    height: 80px;
   }
   .header {
     widows: 100%;
@@ -373,8 +394,23 @@ export default {
       }
       .content {
         padding-left: 10px;
-        .el-form-item__content {
+        ::v-deep .el-form-item__content {
           overflow: hidden;
+        }
+        ::v-deep .el-form-item__content {
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap; 
+          .el-link {
+            width: 100%;
+          }
+          .el-link--inner {
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap; 
+          }
         }
       }
     }
@@ -384,3 +420,5 @@ export default {
   }
 }
 </style>
+
+ 

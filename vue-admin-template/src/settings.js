@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'bitkeep Admin',
+  title: 'BitKeep Admin',
 
   /**
    * @type {boolean} true | false

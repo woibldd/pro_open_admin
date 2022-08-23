@@ -210,7 +210,7 @@ export default {
     },
     async submitApproval(type) {
       if (type == 1) {
-        const r = await this.$confirm('确认通过后将在页面中显示改币种，确认审核通过？')
+        const r = await this.$confirm('确认通过后将在页面中显示该nft，确认审核通过？')
         if (r !== 'confirm') return
       } else {
         await this.$refs['dataForm'].validate()

@@ -88,7 +88,7 @@
           <el-button v-if="row.status == 0"  type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
             审核通过
           </el-button>
-          <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
+          <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleReject(row, 'refuse')">
             拒绝
           </el-button>
           <el-button size="mini" @click.stop="$router.push(`/approval/dapp/detail/${row.id}`)">
@@ -113,7 +113,10 @@
           <span>{{ appovalFormData.data.coin }} </span>
         </el-form-item> -->
         <el-form-item label="主链：">
-          <span>{{ appovalFormData.data.chains }} </span>
+          <span>{{ getChainName(appovalFormData.data.chain)  }} </span>
+        </el-form-item>
+        <el-form-item label="主链标签：">
+          <span>{{ getChainListName(appovalFormData.data.chains)  }} </span>
         </el-form-item>
         <el-form-item label="Tags：">
           <span>{{ appovalFormData.data.tags }}</span>
@@ -127,31 +130,7 @@
         </el-form-item> 
         <el-form-item label="URL：">
           <span>{{ appovalFormData.data.url }}</span>
-        </el-form-item>
-        <!-- <el-form-item label="官网">
-          <span>{{ appovalFormData.data.website }}</span>
-        </el-form-item> -->
-        <!-- <el-form-item label="Github:">
-          <span>{{ appovalFormData.data.github }}</span>
-        </el-form-item>
-        <el-form-item label="Telegram:">
-          <span>{{ appovalFormData.data.telegram }}</span>
-        </el-form-item>
-        <el-form-item label="Facebook:">
-          <span>{{ appovalFormData.data.facebook }}</span>
-        </el-form-item>
-        <el-form-item label="Discord:">
-          <span>{{ appovalFormData.data.discord }}</span>
-        </el-form-item> -->
-        <!-- <el-form-item label="邮箱:">
-          <span>{{ appovalFormData.data.email }}</span>
-        </el-form-item>
-        <el-form-item label="社区信息:">
-          <span>{{ appovalFormData.data.community_info }}</span>
-        </el-form-item>
-        <el-form-item label="推荐人:">
-          <span>{{ appovalFormData.data.recommender }}</span>
-        </el-form-item> -->
+        </el-form-item> 
 
         <el-form-item v-if="appovalFormData.type != 'approval'" prop="remark" label="拒绝原因" :rules="[{ required: true, message: '请填写拒绝原因' }]" style="max-width:100%">
           <el-input style="max-width:100%" v-model="appovalFormData.remark" :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" placeholder="请填写拒绝原因" />
@@ -178,6 +157,7 @@ import ContainerHeader from '@/components/ContainerHeader'
 import ContainerFooter from '@/components/ContainerFooter'
 import clip from '@/utils/clipboard'
 import { BigNumber } from "bignumber.js";
+import {getChainName, getChainListName} from '@/utils/chain-help'
 const calendarTypeOptions = [
   { key: 0, display_name: '审核中', tagtype: 'warn' },
   { key: 1, display_name: '审核通过', tagtype: 'success' },
@@ -273,6 +253,8 @@ export default {
     this.getList()
   },
   methods: {
+    getChainName,
+    getChainListName,
     getList(noLoading) {
       if (!noLoading) {
         this.listLoading = true
@@ -318,6 +300,28 @@ export default {
     },
     // symbol', 'currency', 'chain', 'contract'
     async handleApproval(row, type) {
+      
+      const r = await this.$confirm('确认通过后将在页面中显示改DApp，确认审核通过？')
+      if (r !== 'confirm') return 
+       
+      verify({ id: row.id, status: 1, remark:'' })
+        .then(res => {
+          this.handleFilter()
+          this.$notify({
+            title: '提示',
+            message: '提交成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.submitLoading = false
+          this.dialogFormVisible = false
+        })
+        .catch(err => {
+          this.submitLoading = false
+          this.getList(true)
+        })
+    },
+    async handleReject(row, type) {
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -327,8 +331,8 @@ export default {
       this.appovalFormData.type = type
       this.appovalFormData.row = row
       this.appovalFormData.data = JSON.parse(JSON.stringify(row))
-      this.appovalFormData.remark = ''
-      this.getPrice()
+      this.appovalFormData.remark = '' 
+
     },
     async getPrice(){
      const { data, status } =  await getPrice({

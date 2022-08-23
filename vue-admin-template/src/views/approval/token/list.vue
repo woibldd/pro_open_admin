@@ -83,7 +83,7 @@
           <el-button v-if="row.status == 0" type="primary" size="mini" @click.stop="handleApproval(row, 'approval')">
             审核通过
           </el-button>
-          <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleApproval(row, 'refuse')">
+          <el-button v-if="row.status == 0" size="mini" type="danger" @click.stop="handleReject(row, 'refuse')">
             拒绝
           </el-button>
           <el-button size="mini" @click.stop="$router.push(`/approval/token/detail/${row.id}`)">
@@ -108,7 +108,7 @@
           <span>{{ appovalFormData.data.coin }} </span>
         </el-form-item>
         <el-form-item label="主链：">
-          <span>{{ appovalFormData.data.chain }}</span>
+          <span>{{ getChainName(appovalFormData.data.chain) }}</span>
         </el-form-item>
         <el-form-item label="合约地址：">
           <span>{{ appovalFormData.data.contract }}</span>
@@ -162,6 +162,7 @@ import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import ContainerHeader from '@/components/ContainerHeader'
 import ContainerFooter from '@/components/ContainerFooter'
+import {getChainName} from '@/utils/chain-help'
 import clip from '@/utils/clipboard'
 import { BigNumber } from "bignumber.js";
 const calendarTypeOptions = [
@@ -259,6 +260,7 @@ export default {
     this.getList()
   },
   methods: {
+    getChainName,
     getList(noLoading) {
       if (!noLoading) {
         this.listLoading = true
@@ -304,6 +306,38 @@ export default {
     },
     // symbol', 'currency', 'chain', 'contract'
     async handleApproval(row, type) {
+      // this.dialogFormVisible = true
+      // this.$nextTick(() => {
+      //   this.$refs['dataForm'].clearValidate()
+      //   this.$refs['dataForm'].resetFields()
+      // })
+      // this.appovalFormData.price = 0
+      // this.appovalFormData.type = type
+      // this.appovalFormData.row = row
+      // this.appovalFormData.data = JSON.parse(JSON.stringify(row))
+      // this.appovalFormData.remark = ''
+      // this.getPrice()
+ 
+      const r = await this.$confirm('确认通过后将在页面中显示该币种，确认审核通过？')
+      if (r !== 'confirm') return  
+
+      verify({ id: row.id, status: 1, remark:'' })
+        .then(res => {
+          this.handleFilter()
+          this.$notify({
+            title: '提示',
+            message: '提交成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.submitLoading = false 
+        })
+        .catch(err => {
+          this.submitLoading = false
+          this.getList(true)
+        })
+    },
+    async handleReject(row, type) {
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
@@ -316,6 +350,7 @@ export default {
       this.appovalFormData.remark = ''
       this.getPrice()
     },
+
     async getPrice(){
      const { data, status } =  await getPrice({
         currency: 'usdt',

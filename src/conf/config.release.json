@@ -7,16 +7,16 @@
         "auth": ""
     },
     "mysql_open": {
-        "host": "10.7.5.106",
+        "host": "10.7.63.171",
         "port": 3306,
-        "user": "root",
-        "password": "6yhnmju7_base",
+        "user": "open_user",
+        "password": "iw2134UG89yf",
         "database": "ms_open",
         "connectionLimit" : 60,
         "charset": "UTF8MB4_BIN"
     },
     "mysql": {
-        "host": "10.7.5.106",
+        "host": "10.7.63.171",
         "port": 3306,
         "user": "root",
         "password": "6yhnmju7_base",

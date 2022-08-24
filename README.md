@@ -10,10 +10,7 @@
 # 打包 
 在vue-admin-template文件夹中打包 
     生产
-      npm run build
-
-    测试  
-      npm run build:test
+      npm run build:prod 
 
 
 # 启动文件

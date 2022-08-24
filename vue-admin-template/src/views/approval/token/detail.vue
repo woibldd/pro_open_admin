@@ -9,7 +9,7 @@
         <el-tag class="chain" size="small" type="info" style="margin-right:5px">{{ dataInfo.chain | UpperCase }}链</el-tag>
         <el-tag size="small" type="info" v-if="dataInfo.contract || dataInfo.contract.length == 2">代币</el-tag>
         <el-select v-model="lang" placeholder="语言展示" class="lang" @change="langChange">
-          <el-option v-for="item in languageTypeOptions" :key="item.lang" :label="item.lang" :value="item.lang" />
+          <el-option v-for="item in languageTypeOptions" :key="item.lang" :label="getLangTitle(item.lang)" :value="item.lang" />
         </el-select>
       </div>
       <div>
@@ -171,6 +171,22 @@ const calendarTypeOptions = [
   { key: 1, display_name: '审核通过', tagtype: 'success' },
   { key: 2, display_name: '审核拒绝', tagtype: 'danger' }
 ]
+
+
+const langTypes = [
+  { value: 'en', name: '英语' }, 
+  { value: 'zh', name: '简体中文'},
+  { value: 'zh_tw', name: '繁体中文' }, 
+  { value: 'ko', name: '韩语' }, 
+  { value: 'ja', name: '日本語' }, 
+  { value: 'vi', name: '越南语' }, 
+  { value: 'tr', name: '土耳其' }, 
+  { value: 'es_la', name: '拉丁美语' },
+  { value: 'id', name: '印度尼西亚' },
+  { value: 'hi', name: '印地语' },
+  { value: 'ar', name: '阿拉伯语'},
+  { value: 'pt', name: '葡萄牙语' }]
+
 export default {
   name: 'approval_token_detail',
   components: { ContainerHeader },
@@ -225,6 +241,9 @@ export default {
     this.init()
   },
   methods: { 
+    getLangTitle(key) {
+      return (langTypes.find(item => item.value == key) || {}).name
+    },
     init() {
       getDetails({
         id: this.$route.params.id
@@ -310,7 +329,7 @@ export default {
     },
     async submitApproval(type) {
       if (type == 1) {
-        const r = await this.$confirm('确认通过后将在页面中显示该币种，确认审核通过？')
+        const r = await this.$confirm('确认通过后将在BitKeep后台中显示该币种，确认审核通过？')
         if (r !== 'confirm') return
       } else {
         await this.$refs['dataForm'].validate()

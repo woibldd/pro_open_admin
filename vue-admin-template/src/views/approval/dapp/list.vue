@@ -301,7 +301,7 @@ export default {
     // symbol', 'currency', 'chain', 'contract'
     async handleApproval(row, type) {
       
-      const r = await this.$confirm('确认通过后将在页面中显示改DApp，确认审核通过？')
+      const r = await this.$confirm('确认通过后将在BitKeep后台中显示该DApp，确认审核通过？')
       if (r !== 'confirm') return 
        
       verify({ id: row.id, status: 1, remark:'' })

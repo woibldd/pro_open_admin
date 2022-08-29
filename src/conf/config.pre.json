@@ -1,0 +1,40 @@
+{
+	"debug": true,
+     "port": 8855,
+	"redis": {
+        "host": "10.7.161.254",
+        "port": 6379,
+        "auth": ""
+    },
+    "mysql_open": {
+        "host": "10.7.159.249",
+        "port": 3306,
+        "user": "root",
+        "password": "6yhnmju7@cc",
+        "database": "ms_open",
+        "connectionLimit" : 60,
+        "charset": "UTF8MB4_BIN"
+    },
+    "mysql": {
+        "host": "10.7.159.249",
+        "port": 3306,
+        "user": "root",
+        "password": "6yhnmju7@cc",
+        "database": "ms_open_admin",
+        "connectionLimit" : 60,
+        "charset": "UTF8MB4_BIN"
+    },
+    "host_defi": "http://ms.defi:8883",
+    "host_dapp": "http://ms.defi:8884",
+    "host_chain": "http://ms.chain:8874",
+    "host_coin": "http://ms.coin:8876",
+    "host_language": "http://ms.language:8870",
+    "host_user": "http://ms.user:8872",
+    "host_nft":"http://ms.nft:8878",
+    "host_market": "http://ms.market:8886",
+    "host_logger": "http://ms.price:8894",
+    "host_price": "http://ms.price:8895",
+    "host_message": "http://ms.price:8896",
+    "host_swap": "http://ms.price:8882",
+    "host_operation": "http://ms.price:8898"
+}

@@ -129,7 +129,7 @@ module.exports = class TokenController extends CoreController {
         if (coins && coins.list && coins.list.length > 0) {
             coin = coins.list[0];
             if (coin.owner_eth_address !== token.owner_eth_address || id !== coin.open_id) 
-                throw new Error('线上已存在该Token, 请重新确认');
+                throw new Error('线上已存在该DApp, 请重新确认');
                 // throw new Error(`coin.address:${coin.owner_eth_address}, coin.id:${coin.open_id}, token.address:${token.owner_eth_addres}, token:id${id}`);
         }
 

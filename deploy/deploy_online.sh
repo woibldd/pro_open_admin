@@ -7,7 +7,7 @@ TARGET_DIR="/data/vhosts/${NAME}"
 HISTORY_DIR="${DEPLOY_DIR}/history"
 
 INSTANCES=(
-"pro.open.admin"
+"project"
 )
 
 function deploy_message() {

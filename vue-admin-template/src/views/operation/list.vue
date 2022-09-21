@@ -26,7 +26,7 @@
 
     <!-- <ContainerFooter> -->
     <div style="height:100px"></div>
-    <pagination v-show="total > 0" class="footer-pagination" align="right" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList" />
+    <pagination v-show="total > 0" class="footer-pagination" align="right" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="getList" />
     <!-- </ContainerFooter> -->
   </div>
 </template>

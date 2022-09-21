@@ -95,7 +95,7 @@
 
     <div style="height:100px"></div>
     <!-- <ContainerFooter> -->
-    <pagination v-show="total > 0" class="footer-pagination" align="right" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
+    <pagination v-show="total > 0" class="footer-pagination" align="right" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
     <!-- </ContainerFooter> -->
 
     <el-dialog :title="appovalFormData.type != 'approval' ? '拒绝审核' : '审核通过'" :visible.sync="dialogFormVisible">

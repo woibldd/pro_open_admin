@@ -100,7 +100,7 @@
 
     <div style="height:100px"></div>
     <!-- <ContainerFooter> --> 
-    <pagination v-show="total > 0" class="footer-pagination" align="right" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
+    <pagination v-show="total > 0" class="footer-pagination" align="right" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="getList(false)" />
     <!-- </ContainerFooter> -->
 
     <el-dialog :title="appovalFormData.type != 'approval' ? '拒绝审核' : '审核通过'" :visible.sync="dialogFormVisible">
@@ -149,7 +149,7 @@
 </template>
 
 <script>
-import { getList, verify, getPrice, update } from '@/api/dapp'
+import { getList, verify, update } from '@/api/dapp'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -333,18 +333,7 @@ export default {
       this.appovalFormData.data = JSON.parse(JSON.stringify(row))
       this.appovalFormData.remark = '' 
 
-    },
-    async getPrice(){
-     const { data, status } =  await getPrice({
-        currency: 'usdt',
-        symbol: this.appovalFormData.data.coin,
-        chain: this.appovalFormData.data.chain,
-        contract: this.appovalFormData.data.contract
-      }).catch(err=>({status:5000}))
-      if (status == 0){
-         this.price_from_list = Object.entries(data).map(([key, value]) => ({ key: key == 'all' ? 'auto' : key, value }))
-      }     
-    },
+    }, 
     async submitApproval() {
       this.$refs['dataForm'].validate(async valid => {
         if (!valid) return

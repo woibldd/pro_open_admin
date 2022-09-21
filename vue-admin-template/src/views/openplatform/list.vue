@@ -31,7 +31,7 @@
     </el-table>
 
     <!-- <ContainerFooter> -->
-    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.pageSize" @pagination="getList" />
+    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.pageNum" :limit.sync="listQuery.pageSize" @pagination="getList" />
     <!-- </ContainerFooter> -->
 
     <el-dialog :title="dialogType === 'edit' ? '编辑用户' : '添加用户'" :visible.sync="dialogFormVisible">
@@ -59,20 +59,20 @@
         </div>
       </el-form>
 
-      <div slot="footer" class="dialog-footer">
+      <!-- <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
         <el-button type="primary" @click="handleSave" :loading="submitLoading">
           保存
         </el-button>
-      </div>
+      </div> -->
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getList, update, add } from '@/api/openplatform'
+import { getList } from '@/api/openplatform'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -222,32 +222,32 @@ export default {
       }
       this.handleFilter()
     },
-    async handleSave() {
-      this.$refs['dataForm'].validate(valid => {
-        if (!valid) return
-        this.submitLoading = true
-        const { loginName, password, id } = this.userData
-        const permission = this.$refs.tree.getCheckedKeys()
-        const requetst = this.dialogType == 'edit' ? update({ id, loginName, password, permission: permission.join(',') }) : update({ loginName, password, permission: permission.join(',') })
-        requetst
-          .then(res => {
-            this.getList()
+    // async handleSave() {
+    //   this.$refs['dataForm'].validate(valid => {
+    //     if (!valid) return
+    //     this.submitLoading = true
+    //     const { loginName, password, id } = this.userData
+    //     const permission = this.$refs.tree.getCheckedKeys()
+    //     const requetst = this.dialogType == 'edit' ? update({ id, loginName, password, permission: permission.join(',') }) : update({ loginName, password, permission: permission.join(',') })
+    //     requetst
+    //       .then(res => {
+    //         this.getList()
 
-            this.$notify({
-              title: '提示',
-              message: '提交成功',
-              type: 'success',
-              duration: 2000
-            })
-            this.submitLoading = false
-            this.dialogFormVisible = false
-          })
-          .catch(err => {
-            this.submitLoading = false
-            this.getList()
-          })
-      })
-    },
+    //         this.$notify({
+    //           title: '提示',
+    //           message: '提交成功',
+    //           type: 'success',
+    //           duration: 2000
+    //         })
+    //         this.submitLoading = false
+    //         this.dialogFormVisible = false
+    //       })
+    //       .catch(err => {
+    //         this.submitLoading = false
+    //         this.getList()
+    //       })
+    //   })
+    // },
 
     getSortClass: function(key) {
       const sort = this.listQuery.sort
